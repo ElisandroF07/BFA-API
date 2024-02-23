@@ -9,16 +9,16 @@ module.exports = (multer({
     storage: multer.diskStorage({
         destination: async (req: Request, file: any, cb: any) => {
             if (req.params.imageRole === 'BI_FRENTE') {
-                cb(null, '../public/upload/bi/frente')
+                cb(null, 'src/public/upload/bi/frente')
             }
             else if (req.params.imageRole === 'BI_VERSO') {
-                cb(null, '../public/upload/bi/verso')
+                cb(null, 'src/public/upload/bi/verso')
             }
             else if (req.params.imageRole === 'SELFIE') {
-                cb(null, '../public/upload/selfie/normal')
+                cb(null, 'src/public/upload/selfie/normal')
             }
             else if (req.params.imageRole === 'SELFIE_BI') {
-                cb(null, '../public/upload/selfie/selfie_bi')
+                cb(null, 'src/public/upload/selfie/selfie_bi')
             }
             const phone = req.params.phone
             const client = await prismaCient.client_phones.findFirst({
@@ -33,7 +33,7 @@ module.exports = (multer({
                 await prismaCient.client_images.create({
                     data: {
                         image_role: 1,
-                        path: `../public/upload/bi/frente/BI_FRENTE_${client?.client_id}`,
+                        path: `src/public/upload/bi/frente/BI_FRENTE_${client?.client_id}`,
                         client_id: client?.client_id
                     }
                 });
@@ -42,7 +42,7 @@ module.exports = (multer({
                 await prismaCient.client_images.create({
                     data: {
                         image_role: 2,
-                        path: `../public/upload/bi/verso/BI_VERSO_${client?.client_id}`,
+                        path: `src/public/upload/bi/verso/BI_VERSO_${client?.client_id}`,
                         client_id: client?.client_id
                     }
                 });
@@ -51,7 +51,7 @@ module.exports = (multer({
                 await prismaCient.client_images.create({
                     data: {
                         image_role: 3,
-                        path: `../public/upload/selfie/normal/SELFIE_${client?.client_id}`,
+                        path: `src/public/upload/selfie/normal/SELFIE_${client?.client_id}`,
                         client_id: client?.client_id
                     }
                 });
@@ -60,7 +60,7 @@ module.exports = (multer({
                 await prismaCient.client_images.create({
                     data: {
                         image_role: 4,
-                        path: `../public/upload/selfie/selfie_bi/SELFIE_BI_${client?.client_id}`,
+                        path: `src/public/upload/selfie/selfie_bi/SELFIE_BI_${client?.client_id}`,
                         client_id: client?.client_id
                     }
                 });
