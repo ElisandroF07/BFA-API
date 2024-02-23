@@ -3,7 +3,7 @@ import { VerifyPhoneController } from "../modules/verify-phone/verify-phone.cont
 import { VerifyOTPController } from "../modules/verify-otp/verify-otp.controller";
 import { PersonalDataController } from "../modules/personal-data/personal-data.controller";
 const multer  = require('multer')
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: 'public/' })
 const uploadImageMiddleware = require('../middlewares/uploadImage.middleware')
 
 const router = Router()
