@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model register_requests {
+  request_id   Int       @id @default(autoincrement())
+  otp_code     String?
+  created_at   DateTime? @db.Date
+  phone_number BigInt?
+  finished     Boolean?  @default(false)
+}
+
+model client_roles {
+  role_id   Int      @id(map: "roles_pkey") @default(autoincrement())
+  role_name String?  @db.VarChar(20)
+  client    client[]
+}
+
+model contact_roles {
+  role_id       Int             @id(map: "phone_roles_pkey") @default(autoincrement())
+  name          String
+  client_email  client_email[]
+  client_phones client_phones[]
+}
+
+model client {
+  personal_data     Json?
+  professional_data Json?
+  address           Json?
+  client_id         Int             @id(map: "clients_pkey") @default(autoincrement())
+  role_id           Int             @db.SmallInt
+  bi_number         String?
+  client_roles      client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
+  client_email      client_email[]
+  client_images     client_images[]
+  client_phones     client_phones[]
+}
+
+model client_email {
+  email_id      Int           @id(map: "user_email_pkey") @default(autoincrement())
+  email_address String
+  verified      Boolean       @default(false)
+  role_id       Int           @db.SmallInt
+  client_id     Int           @db.SmallInt
+  contact_roles contact_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
+  client        client        @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
+}
+
+model client_phones {
+  id_phone      Int           @id(map: "client_phone_pkey") @default(autoincrement())
+  phone_number  BigInt
+  verified      Boolean       @default(false)
+  role_id       Int           @default(1) @db.SmallInt
+  client_id     Int           @db.SmallInt
+  contact_roles contact_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
+  client        client        @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_mid")
+}
+
+model client_images {
+  id_client_image Int          @id(map: "users_images_pkey") @default(autoincrement())
+  path            String?
+  client_id       Int?         @db.SmallInt
+  image_role      Int?         @db.SmallInt
+  client          client?      @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "client_id_fk")
+  image_roles     image_roles? @relation(fields: [image_role], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_image_role")
+}
+
+model image_roles {
+  role_id       Int             @id @default(autoincrement())
+  name          String?
+  client_images client_images[]
+}
