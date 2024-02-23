@@ -8,6 +8,10 @@ const uploadImageMiddleware = require('../middlewares/uploadImage.middleware')
 
 const router = Router()
 
+router.get('/', async(resquest: Request, response: Response)=>{
+    response.status(200).json({message: 'Server Running'})
+})
+
 router.post("/verify-phone", async (request: Request, response: Response)=>{
     const {phone} = request.body
     if (!phone) {

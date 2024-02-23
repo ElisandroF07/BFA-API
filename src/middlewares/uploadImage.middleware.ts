@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client"
 import { Request } from "express"
 import { prismaCient } from "../infra/database/prismaClient"
-const primaClient = new PrismaClient()
 
 const multer = require('multer')
 
