@@ -22,8 +22,6 @@ export class VerifyPhoneUseCase {
         return OTP
     }
 
-
-
     async encrypt(OTP: string) {
         const salt = await bcrypt.genSalt(12)
         const OTPHash = await bcrypt.hash(OTP, salt)
@@ -42,7 +40,7 @@ export class VerifyPhoneUseCase {
             console.log('foi')
         })
         .catch((err:any) => {
-            console.log(err)
+            console.log('erro')
         });
         
     }
@@ -160,7 +158,6 @@ export class VerifyPhoneUseCase {
         }
     }
     
-
     async execute(phone_number: number, response: Response) {
         await this.createRegister(phone_number, response);
     }
