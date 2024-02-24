@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client'
 import { Response } from 'express';
-import { differenceInHours } from 'date-fns';
 import { formatISO } from 'date-fns';
 require('dotenv').config()
 const accountSid = "AC38f48917b06eb201e62eb728548b4f46"
@@ -125,7 +124,7 @@ export class VerifyPhoneUseCase {
                                 created_at: formatISO(date)
                             }
                         }).then(()=>{return response.status(201).json({message: 'Código enviado para o seu telemóvel!'});})
-                        .catch((err) => {console.log(err)});
+                        .catch((err: any) => {console.log(err)});
                     }
                     catch(err){
                         return response.status(500).json({message: 'Tente novamente mais tarde.', error_code: '#AUTHT001'})
@@ -148,7 +147,7 @@ export class VerifyPhoneUseCase {
                             phone_number: phone_requester,
                         }
                     }).then(()=>{return response.status(201).json({message: 'Código enviado para o seu telemóvel!'});})
-                    .catch((err) => {console.log(err)});
+                    .catch((err: any) => {console.log(err)});
     
                     
                 }
