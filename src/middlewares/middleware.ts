@@ -12,7 +12,7 @@ export const uploadMulter = multer({ storage: multer.memoryStorage() }).any()
 export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => {
   const b2 =  new B2({
     applicationKeyId: process.env.KEY_ID || "cda81929a5e9",
-    applicationKey: process.env.APP_KEY || "005a89bbb1ca76933bb25837dfd57d1466526fae25"
+    applicationKey: process.env.APP_KEY || "0052e45668b6f848a150b2e1036f87537588fcaf09"
   })
 
   const authResponse = await b2.authorize()
@@ -70,7 +70,7 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
     await prismaCient.client_images.create({
         data: {
             image_role: 1,
-            path: `${downloadUrl}/file/${process.env.BUCKET_NAME}/clients_images/bi_front/BI_FRENTE_${client?.client_id}`,
+            path: `${downloadUrl}/file/${process.env.BUCKET_NAME || "bfa-cloud-storage"}/clients_images/bi_front/BI_FRENTE_${client?.client_id}`,
             client_id: client?.client_id
         }
     });
@@ -81,7 +81,7 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
       await prismaCient.client_images.create({
           data: {
               image_role: 2,
-              path: `${downloadUrl}/file/${process.env.BUCKET_NAME}/clients_images/bi_back/BI_VERSO_${client?.client_id}`,
+              path: `${downloadUrl}/file/${process.env.BUCKET_NAME || "bfa-cloud-storage"}/clients_images/bi_back/BI_VERSO_${client?.client_id}`,
               client_id: client?.client_id
           }
       });
@@ -92,7 +92,7 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
       await prismaCient.client_images.create({
           data: {
               image_role: 3,
-              path: `${downloadUrl}/file/${process.env.BUCKET_NAME}/clients_images/selfies/SELFIE_${client?.client_id}`,
+              path: `${downloadUrl}/file/${process.env.BUCKET_NAME || "bfa-cloud-storage"}/clients_images/selfies/SELFIE_${client?.client_id}`,
               client_id: client?.client_id
           }
       });
@@ -103,7 +103,7 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
       await prismaCient.client_images.create({
           data: {
               image_role: 4,
-              path: `${downloadUrl}/file/${process.env.BUCKET_NAME}/clients_images/selfies_with_bi/SELFIE_BI_${client?.client_id}`,
+              path: `${downloadUrl}/file/${process.env.BUCKET_NAME || "bfa-cloud-storage"}/clients_images/selfies_with_bi/SELFIE_BI_${client?.client_id}`,
               client_id: client?.client_id
           }
       });
@@ -114,7 +114,7 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
     await prismaCient.client_images.create({
         data: {
             image_role: 5,
-            path: `${downloadUrl}/file/${process.env.BUCKET_NAME}/clients_images/profile_pictures/PROFILE_${client?.client_id}`,
+            path: `${downloadUrl}/file/${process.env.BUCKET_NAME || "bfa-cloud-storage"}/clients_images/profile_pictures/PROFILE_${client?.client_id}`,
             client_id: client?.client_id
         }
     });
