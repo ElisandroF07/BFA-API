@@ -1,10 +1,14 @@
-import { Request, Response, Router } from "express";
+import { type Request, type Response, Router } from "express";
 import { VerifyPhoneController } from "../modules/verify-phone/verify-phone.controller";
 import { VerifyOTPController } from "../modules/verify-otp/verify-otp.controller";
 import { PersonalDataController } from "../modules/personal-data/personal-data.controller";
-const uploadImageMiddleware = require('../middlewares/uploadImage.middleware')
+import { uploadMulter, uploadB2 } from "../middlewares/middleware";
 
 const router = Router()
+
+router.get('/', async(resquest: Request, response: Response)=>{
+    response.status(200).json({message: 'Server Running'})
+})
 
 router.post("/verify-phone", async (request: Request, response: Response)=>{
     const {phone} = request.body
@@ -30,8 +34,8 @@ router.post("/verify-otp", async (request: Request, response: Response)=>{
     }
 })
 
-router.post("/upload-image/:phone/:imageRole", uploadImageMiddleware.single('image'), async (request: Request, response: Response)=>{
-    response.status(201).json({message: 'Imagens carregadas com sucesso!'})
+router.post("/upload/:phone/:imageRole", uploadMulter, uploadB2,async (request: Request, response: Response)=>{
+    response.status(200).json({message: "Imagem carregada com sucesso!"})
 })
 
 router.post("/personal-data", async(request: Request, response: Response)=>{
