@@ -124,7 +124,7 @@ export class VerifyPhoneUseCase {
                                 created_at: formatISO(date)
                             }
                         }).then(()=>{return response.status(201).json({message: 'Código enviado para o seu telemóvel!'});})
-                        .catch((err) => {console.log(err)});
+                        .catch((err: any) => {console.log(err)});
                     }
                     catch(err){
                         return response.status(500).json({message: 'Tente novamente mais tarde.', error_code: '#AUTHT001'})
@@ -147,7 +147,7 @@ export class VerifyPhoneUseCase {
                             phone_number: phone_requester,
                         }
                     }).then(()=>{return response.status(201).json({message: 'Código enviado para o seu telemóvel!'});})
-                    .catch((err) => {console.log(err)});
+                    .catch((err: any) => {console.log(err)});
     
                     
                 }
