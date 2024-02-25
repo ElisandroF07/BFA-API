@@ -37,7 +37,6 @@ export class VerifyPhoneUseCase {
             to: phone_number
         })
         .then(() => {
-            console.log('foi')
         })
         .catch((err:any) => {
             console.log('erro')
