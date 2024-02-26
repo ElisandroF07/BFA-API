@@ -3,6 +3,7 @@ import { VerifyPhoneController } from "../modules/verify-phone/verify-phone.cont
 import { VerifyOTPController } from "../modules/verify-otp/verify-otp.controller";
 import { PersonalDataController } from "../modules/personal-data/personal-data.controller";
 import { uploadMulter, uploadB2 } from "../middlewares/middleware";
+import { GetBICOntroller } from "../modules/getBI/getBI.controller";
 
 const router = Router()
 
@@ -47,6 +48,10 @@ router.post("/personal-data", async(request: Request, response: Response)=>{
     else {
         new PersonalDataController().handle(request.body, request, response)
     }
+})
+
+router.get('/getBI/:phone', async(request: Request, response: Response)=>{
+    new GetBICOntroller().handle(request, response, request.body)
 })
 
 export {router}
