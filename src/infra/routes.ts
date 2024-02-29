@@ -4,6 +4,9 @@ import { VerifyOTPController } from "../modules/verify-otp/verify-otp.controller
 import { PersonalDataController } from "../modules/personal-data/personal-data.controller";
 import { uploadMulter, uploadB2 } from "../middlewares/middleware";
 import { GetBICOntroller } from "../modules/getBI/getBI.controller";
+import { VerifyEmailController } from "../modules/verify-email/verify-email.controller";
+import { VerifyTokenController } from "../modules/verify-token/verify-token.controller";
+import { ResendEmailController } from "../modules/resend-email/resend-email.controller";
 
 const router = Router()
 
@@ -52,6 +55,18 @@ router.post("/personal-data", async(request: Request, response: Response)=>{
 
 router.get('/getBI/:phone', async(request: Request, response: Response)=>{
     new GetBICOntroller().handle(request, response, request.body)
+})
+
+router.get('/sendEmail/:email', async(request: Request, response: Response)=>{
+    new VerifyEmailController().handle(response, request)
+})
+
+router.get('/email/:email/verify/:token', async(request: Request, response: Response)=>{
+    new VerifyTokenController().handle(response, request)
+})
+
+router.get('/resendEmail/:email', async(request: Request, response: Response)=>{
+    new ResendEmailController().handle(response, request)
 })
 
 export {router}

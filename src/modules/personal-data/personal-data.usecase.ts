@@ -1,3 +1,4 @@
+
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
 import { Request, Response } from "express";
@@ -17,12 +18,18 @@ export class PersonalDataUseCase {
     async uploadData(data: IProps, response: Response){
         const {phone, email, name, biNumber} = data
         const body = JSON.stringify({
-            affairsReceipt:biNumber,
-            affairsType:"IDCard",
-            captchaValue:""
+            affairsReceipt: biNumber,
+            affairsType: "IDCard",
+            captchaValue: ""
         })
-        const res = await axios.post(`https://bi-bs.minjusdh.gov.ao/pims-backend/api/v1/progress`, body, {headers: {"Content-Type": "application/json"}})
-        if(res.data.affairsProgressState === 'Activate'){
+
+        try {
+            const res = await axios.post(`https://bi-bs.minjusdh.gov.ao/pims-backend/api/v1/progress`, body, {headers: {"Content-Type": "application/json"}})
+
+            if(res.data.affairsProgressState !== 'Activate'){
+                return response.status(403).json({message: 'BI não cadastrado nos Serviços de Identificação!'})
+            }
+
             const client = await prismaClient.client_phones.findFirst({
                 where: {
                     phone_number: parseInt('244'+phone)
@@ -31,20 +38,24 @@ export class PersonalDataUseCase {
                     client_id: true
                 }
             })
-            console.log(client?.client_id)
+
+            if(!client){
+                return response.status(404).json({message: 'Cliente não encontrado!'})
+            }
+
             await prismaClient.client_email.create({
                 data: {
                     email_address: email,
                     role_id: 1,
                     verified: false,
-                    client_id: client?.client_id || 0
+                    client_id: client.client_id
                 }
             })
+
             await prismaClient.client.updateMany({
                 where: {
-                    client_id: client?.client_id
+                    client_id: client.client_id
                 },
-    
                 data: {
                     personal_data: {
                         name: name,
@@ -53,15 +64,15 @@ export class PersonalDataUseCase {
                         country: 'Angola',
                         province: '',
                     },
-                    bi_number: data.biNumber
+                    bi_number: biNumber
                 }
             })
+
             return response.status(201).json({message: 'Dados enviados com sucesso!'})
+        } catch (error) {
+            console.error(error)
+            return response.status(500).json({message: 'Ocorreu um erro ao processar a solicitação!'})
         }
-        else {
-            return response.status(403).json({message: 'BI não cadastrado nos Serviços de Identificação!'})
-        }
-        
     }
 
     async execute(data: IProps, request: Request, response: Response){

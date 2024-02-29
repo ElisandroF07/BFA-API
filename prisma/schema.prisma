@@ -13,6 +13,8 @@ model register_requests {
   created_at   DateTime? @db.Date
   phone_number BigInt?
   finished     Boolean?  @default(false)
+  token        String?
+  email        String?
 }
 
 model client_roles {
@@ -46,9 +48,10 @@ model client_email {
   email_address String
   verified      Boolean       @default(false)
   role_id       Int           @db.SmallInt
-  client_id     Int           @db.SmallInt
+  client_id     Int?          @db.SmallInt
+  token         String?
   contact_roles contact_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
-  client        client        @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
+  client        client?       @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
 }
 
 model client_phones {
