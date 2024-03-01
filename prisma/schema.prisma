@@ -39,6 +39,7 @@ model client {
   bi_number         String?
   membership_number String?
   access_code       String?
+  token             String?
   account           account[]
   client_roles      client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
   client_email      client_email[]

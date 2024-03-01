@@ -28,10 +28,7 @@ export class LoginUseCase{
             
             if (await bcrypt.compare(access_code, client.access_code)) {
                 const secret = process.env.SECRET
-                const token = jwt.sign({
-                    id: client.client_id
-                }, secret, { expiresIn: '1h' }) // Define o tempo de expiração do token
-                return response.status(201).json({client, token})
+                return response.status(201).json({message: 'Sucesso!'})
             } else {
                 return response.status(200).json({message: "Código de acesso incorreto!"})
             }

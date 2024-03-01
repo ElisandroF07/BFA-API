@@ -7,6 +7,11 @@ import { VerifyTokenController } from "../modules/verify-token/verify-token.cont
 import { ResendEmailController } from "../modules/resend-email/resend-email.controller";
 import { GenerateCredentialsController } from "../modules/generateCredentials/generateCredential.controller";
 import { LoginController } from "../modules/login/login.controller";
+import { TwoFactorAuthController } from "../modules/2fa/2fa.controller";
+import { Verify2FAController } from "../modules/verify-2fa/verify-2fa.controller";
+import { ResetPasswordController } from "../modules/resetPassword/resetPassword.controller";
+import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
+import { SetAcessCodeController } from "../modules/setAccessCode/setAccessCode.controller";
 
 const router = Router()
 
@@ -51,6 +56,26 @@ router.get('/generateCredentials/:email', async(request: Request, response: Resp
 
 router.post('/login', async(request: Request, response: Response)=>{
     new LoginController().handle(request.body, response)
+})
+
+router.get('/2fa/:membership_number', async(request: Request, response: Response)=>{
+    new TwoFactorAuthController().handle(response, request)
+})
+
+router.get('/email/:email/2fa/:token', async(request: Request, response: Response)=>{
+    new Verify2FAController().handle(response, request)
+})
+
+router.get('/resetPassword/:email', async(request: Request, response: Response)=>{
+    new ResetPasswordController().handle(request, response)
+})
+
+router.get('/email/:email/resetPassword/:token', async(request: Request, response: Response)=>{
+    new VerifyResetController().handle(request, response)
+})
+
+router.post('/setAccessCode', async(request: Request, response: Response)=>{
+    new SetAcessCodeController().handle(request.body, response)
 })
 
 export {router}
