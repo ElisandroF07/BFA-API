@@ -13,6 +13,8 @@ model register_requests {
   created_at   DateTime? @db.Date
   phone_number BigInt?
   finished     Boolean?  @default(false)
+  token        String?
+  email        String?
 }
 
 model client_roles {
@@ -35,6 +37,10 @@ model client {
   client_id         Int             @id(map: "clients_pkey") @default(autoincrement())
   role_id           Int             @db.SmallInt
   bi_number         String?
+  membership_number String?
+  access_code       String?
+  token             String?
+  account           account[]
   client_roles      client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
   client_email      client_email[]
   client_images     client_images[]
@@ -46,9 +52,10 @@ model client_email {
   email_address String
   verified      Boolean       @default(false)
   role_id       Int           @db.SmallInt
-  client_id     Int           @db.SmallInt
+  client_id     Int?          @db.SmallInt
+  token         String?
   contact_roles contact_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
-  client        client        @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
+  client        client?       @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
 }
 
 model client_phones {
@@ -74,4 +81,31 @@ model image_roles {
   role_id       Int             @id @default(autoincrement())
   name          String?
   client_images client_images[]
+}
+
+model account {
+  account_id     Int     @id @default(autoincrement())
+  client_id      Int?    @db.SmallInt
+  account_iban   String?
+  created_at     String?
+  account_number String?
+  client         client? @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_id")
+  card           card[]
+}
+
+model card {
+  card_id    Int         @id @default(autoincrement())
+  number     BigInt?
+  role_id    Int?        @db.SmallInt
+  account_id Int?        @db.SmallInt
+  created_at String?
+  pin        String?
+  account    account?    @relation(fields: [account_id], references: [account_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_id")
+  card_roles card_roles? @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
+}
+
+model card_roles {
+  role_id Int    @id @default(autoincrement())
+  name    String
+  card    card[]
 }

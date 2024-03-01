@@ -4,59 +4,51 @@ import B2 from 'backblaze-b2'
 import dotenv from 'dotenv'
 import { prismaCient } from "../infra/database/prismaClient"
 dotenv.config()
-
-
   
 export const uploadMulter = multer({ storage: multer.memoryStorage() }).any()
 
 export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => {
-  const b2 =  new B2({
-    applicationKeyId: process.env.KEY_ID || "cda81929a5e9",
-    applicationKey: process.env.APP_KEY || "005a89bbb1ca76933bb25837dfd57d1466526fae25"
-  })
+  
+  const b2 =  new B2({applicationKeyId: process.env.KEY_ID ||  "", applicationKey: process.env.APP_KEY || ""})
 
   const authResponse = await b2.authorize()
   const {downloadUrl} = authResponse.data
-  const response = await b2.getUploadUrl({bucketId: process.env.BUCKET_ID || "fced1ad8c1b9d2698ad50e19"})
+  const response = await b2.getUploadUrl({bucketId: process.env.BUCKET_ID || ""})
   const {authorizationToken, uploadUrl} =response.data
-
-  const client = await prismaCient.client_phones.findFirst({
+  
+  const client = await prismaCient.client_email.findFirst({
       where: {
-          phone_number: parseInt('244'+req.params.phone)
+          email_address: req.params.email
       },
       select: {
           client_id: true
       }
   })
-  
+
   const params1 = {
     uploadUrl: uploadUrl,
     uploadAuthToken: authorizationToken,
     fileName: `clients_images/bi_front/BI_FRENTE_${client?.client_id}`,
     data: (req.files as Express.Multer.File[])[0].buffer,
   }
-
   const params2 = {
     uploadUrl: uploadUrl,
     uploadAuthToken: authorizationToken,
     fileName: `clients_images/bi_back/BI_VERSO_${client?.client_id}`,
     data: (req.files as Express.Multer.File[])[0].buffer,
   }
-
   const params3 = {
     uploadUrl: uploadUrl,
     uploadAuthToken: authorizationToken,
     fileName: `clients_images/selfies/SELFIE_${client?.client_id}`,
     data: (req.files as Express.Multer.File[])[0].buffer,
   }
-
   const params4 = {
     uploadUrl: uploadUrl,
     uploadAuthToken: authorizationToken,
     fileName: `clients_images/selfies_with_bi/SELFIE_BI_${client?.client_id}`,
     data: (req.files as Express.Multer.File[])[0].buffer,
   }
-
   const params5 = {
     uploadUrl: uploadUrl,
     uploadAuthToken: authorizationToken,
@@ -118,7 +110,8 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
             client_id: client?.client_id
         }
     });
-}
+  }
 
-next()
+  next()
+
 }
