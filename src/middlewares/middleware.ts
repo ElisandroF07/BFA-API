@@ -16,9 +16,9 @@ export const uploadB2 = async(req:Request, res:Response, next: NextFunction) => 
   const response = await b2.getUploadUrl({bucketId: process.env.BUCKET_ID || ""})
   const {authorizationToken, uploadUrl} =response.data
   
-  const client = await prismaCient.client_phones.findFirst({
+  const client = await prismaCient.client_email.findFirst({
       where: {
-          phone_number: parseInt('244'+req.params.phone)
+          email_address: req.params.email
       },
       select: {
           client_id: true

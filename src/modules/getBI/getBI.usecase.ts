@@ -5,10 +5,10 @@ import { parse } from "date-fns";
 export class GetBIUseCase{ 
     constructor(){}
 
-    async getBi(request: Request, response: Response, phone_requester: number){
-        const phone = await prismaCient.client_phones.findFirst({
+    async getBi(request: Request, response: Response, email: string){
+        const client_email = await prismaCient.client_email.findFirst({
             where: {
-                phone_number: phone_requester
+                email_address: email
             },
             select: {
                 client_id: true
@@ -16,7 +16,7 @@ export class GetBIUseCase{
         })
         const client = await prismaCient.client.findFirst({
             where: {
-                client_id: phone?.client_id || 0
+                client_id: client_email?.client_id || 0
             },
             select: {
                 bi_number: true
@@ -26,7 +26,7 @@ export class GetBIUseCase{
     }
 
     async execute(request: Request, response: Response){
-        const phone = parseInt('244'+request.params.phone)
-        await this.getBi(request, response, phone)
+        const email = request.params.email
+        await this.getBi(request, response, email)
     }
 }

@@ -30,7 +30,7 @@ export class VerifyTokenUseCase {
 
         if(token) {
             if (token.verified) {
-                return response.status(400).json({message: 'Este email já foi verificado!'})
+                return response.redirect('http://localhost:3000/email/error')
             }
             else {
                 if (await bcrypt.compare(user_token, token.token || '')){
@@ -41,15 +41,15 @@ export class VerifyTokenUseCase {
                             token: ''
                         }
                     })
-                    return response.status(200).json({message: 'Email verificado com sucesso!'})
+                    return response.redirect('http://localhost:3000/email/verified')
                 }
                 else {
-                    return response.status(400).json({message: 'Token inválido!'})
+                    return response.redirect('http://localhost:3000/email/error')
                 }
             }
         }
         else {
-            return response.status(400).json({message: 'Endereço de email inválido!'})
+            return response.redirect('http://localhost:3000/email/error')
         }
     }
 

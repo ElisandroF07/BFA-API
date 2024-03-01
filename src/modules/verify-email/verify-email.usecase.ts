@@ -39,7 +39,7 @@ export class VerifyEmailUseCase {
                     })
                     const url = `${process.env.BASE_URL}/email/${email}/verify/${token}`
                     await sendMail(email, "Confirmar Email", url)
-                    return response.status(201).json({ message:"Email enviado para o endereço: ", email })
+                    return response.status(201).json({ message:`Email enviado para o endereço: ${email}`})
                 }
                 catch{
                     return response.status(500).json({message: 'Erro interno! Tente mais tarde.'})
@@ -60,7 +60,7 @@ export class VerifyEmailUseCase {
                 })
                 const url = `${process.env.BASE_URL}/email/${email}/verify/${token}`
                 await sendMail(email, "Confirmar Email", url)
-                response.status(201).json({ message:"Email enviado para o endereço: ", email })
+                response.status(201).json({ message:`Email enviado para o endereço: ${email}`})
             }
             catch {
                 return response.status(500).json({message: 'Erro interno! Tente mais tarde.'})
