@@ -36,7 +36,7 @@ module.exports = async (
                     
                     <p style="margin-top: 40px;"><strong>Número de Adesão:  </strong>${membershipNumber}</p>
                     <p><strong>Código de Acesso:  </strong> ${accessCode}</p>
-                    <a href="http://localhost:3000/login" style="display: inline-block; padding: 10px 20px; background-color: #ff6600; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px;">Login BFA NET</a>
+                    <a href="https://bfanet.vercel.app/login" style="display: inline-block; padding: 10px 20px; background-color: #ff6600; color: #ffffff; text-decoration: none; border-radius: 5px; margin-top: 20px;">Login BFA NET</a>
                 </div>
                 `,
 	});

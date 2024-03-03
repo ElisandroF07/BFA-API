@@ -19,7 +19,7 @@ export class ResendEmailUseCase {
 		if (res) {
 			if (res.verified) {
 				return response
-					.status(422)
+					.status(200)
 					.json({ message: "O email já foi verificado!" });
 			}
 
@@ -44,7 +44,7 @@ export class ResendEmailUseCase {
 			}
 		} else {
 			return response
-				.status(400)
+				.status(200)
 				.json({ message: "Endereço de email inválido!" });
 		}
 	}
