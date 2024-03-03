@@ -1,11 +1,9 @@
-import { Response, Request } from "express";
+import { Request, Response } from "express";
 import { ResendEmailUseCase } from "./resend-email.usecase";
 
-export class ResendEmailController{
-    constructor(){}
-
-    handle(response: Response, request: Request) {
-        const useCase = new ResendEmailUseCase()
-        useCase.execute(response, request)
-    }
+export class ResendEmailController {
+	handle(response: Response, request: Request) {
+		const useCase = new ResendEmailUseCase();
+		useCase.execute(response, request);
+	}
 }
