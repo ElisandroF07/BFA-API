@@ -14,11 +14,7 @@ export class ResendEmailUseCase {
 	async sendToken(email: string, response: Response) {
 		const res = await prismaClient.client_email.findFirst({
 			where: { email_address: email },
-			select: { verified: true, email_id: true, token: true },
-			cacheStrategy: {
-				ttl: 30,
-				swr: 60,
-			}
+			select: { verified: true, email_id: true, token: true }
 		});
 		if (res) {
 			if (res.verified) {

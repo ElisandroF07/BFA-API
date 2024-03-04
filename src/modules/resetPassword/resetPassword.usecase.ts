@@ -15,11 +15,7 @@ export class ResetPasswordUseCase {
 		try {
 			const client_email = await prismaClient.client_email.findFirst({
 				where: { email_address: email },
-				select: { client_id: true },
-				cacheStrategy: {
-					ttl: 30,
-					swr: 60,
-				}
+				select: { client_id: true }
 			});
 			if (client_email) {
 				const token = crypto.randomBytes(32).toString("hex");

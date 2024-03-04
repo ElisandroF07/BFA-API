@@ -21,10 +21,6 @@ export class VerifyTokenUseCase {
 				token: true,
 				verified: true,
 				email_id: true,
-			},
-			cacheStrategy: {
-				ttl: 30,
-				swr: 60,
 			}
 		});
 

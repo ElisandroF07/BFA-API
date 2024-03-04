@@ -21,10 +21,6 @@ export class Verify2FAUseCase {
 				},
 				select: {
 					client_id: true,
-				},
-				cacheStrategy: {
-					ttl: 30,
-					swr: 60,
 				}
 			});
 			const client = await prismaClient.client.findFirst({
@@ -36,10 +32,6 @@ export class Verify2FAUseCase {
 					personal_data: true,
 					bi_number: true,
 					membership_number: true,
-				},
-				cacheStrategy: {
-					ttl: 30,
-					swr: 60,
 				}
 			});
 			if (client) {

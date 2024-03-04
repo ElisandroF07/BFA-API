@@ -18,10 +18,6 @@ export class LoginUseCase {
 				professional_data: true,
 				address: true,
 				role_id: true,
-			},
-			cacheStrategy: {
-				ttl: 30,
-				swr: 60,
 			}
 		});
 		if (client) {
