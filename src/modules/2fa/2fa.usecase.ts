@@ -16,10 +16,18 @@ export class TwoFactorAuthUseCase {
 			const idC = await prismaClient.client.findFirst({
 				where: { membership_number: membership_number },
 				select: { client_id: true },
+				cacheStrategy: {
+					ttl: 30,
+					swr: 60,
+				}
 			});
 			const idE = await prismaClient.client_email.findFirst({
 				where: { client_id: idC?.client_id || 0 },
 				select: { email_address: true },
+				cacheStrategy: {
+					ttl: 30,
+					swr: 60,
+				}
 			});
 			if (idC) {
 				const token = crypto.randomBytes(32).toString("hex");

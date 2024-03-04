@@ -14,7 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.9.1",
+    "@prisma/client": "latest",
+    "@prisma/extension-accelerate": "^1.0.0",
     "@types/multer": "^1.4.11",
     "api": "^2.6.0",
     "axios": "^1.6.7",

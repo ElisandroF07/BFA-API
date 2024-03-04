@@ -11,6 +11,10 @@ export class GetBIUseCase {
 			select: {
 				client_id: true,
 			},
+			cacheStrategy: {
+				ttl: 30,
+				swr: 60,
+			}
 		});
 		const client = await prismaClient.client.findFirst({
 			where: {
@@ -19,6 +23,10 @@ export class GetBIUseCase {
 			select: {
 				bi_number: true,
 			},
+			cacheStrategy: {
+				ttl: 30,
+				swr: 60,
+			}
 		});
 		return response.status(200).json({ biNumber: client?.bi_number });
 	}

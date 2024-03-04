@@ -22,6 +22,10 @@ export class Verify2FAUseCase {
 				select: {
 					client_id: true,
 				},
+				cacheStrategy: {
+					ttl: 30,
+					swr: 60,
+				}
 			});
 			const client = await prismaClient.client.findFirst({
 				where: { client_id: client_email?.client_id || 0 },
@@ -33,6 +37,10 @@ export class Verify2FAUseCase {
 					bi_number: true,
 					membership_number: true,
 				},
+				cacheStrategy: {
+					ttl: 30,
+					swr: 60,
+				}
 			});
 			if (client) {
 				if (await this.compareToken(client.token || "", user_token)) {

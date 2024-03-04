@@ -22,6 +22,10 @@ export class VerifyResetUseCase {
 			select: {
 				client_id: true,
 			},
+			cacheStrategy: {
+				ttl: 30,
+				swr: 60,
+			}
 		});
 		const client = await prismaClient.client.findFirst({
 			where: { client_id: token?.client_id || 0 },
