@@ -1,37 +1,42 @@
-import crypto from "crypto";
 import { Request, Response } from "express";
 import { prismaClient } from "../../infra/database/prismaClient";
-const sendMail = require("../../libs/sendEmail");
+const sendOTP = require("../../libs/sendOTP");
 const bcrypt = require("bcryptjs");
 
 export class TwoFactorAuthUseCase {
-	async encrypt(token: string): Promise<string> {
+
+	async encrypt(OTP: string): Promise<string> {
 		const salt = await bcrypt.genSalt(12);
-		const tokenHash = await bcrypt.hash(token, salt);
-		return tokenHash;
+		const OTPHash = await bcrypt.hash(OTP, salt);
+		return OTPHash;
+	}
+
+	generateOTP():number{
+		return Math.floor(Math.random() * 900000) + 100000
 	}
 
 	async sendToken(membership_number: string, response: Response) {
 		try {
-			const idC = await prismaClient.client.findFirst({
+			const idCLIENT = await prismaClient.client.findFirst({
 				where: { membership_number: membership_number },
 				select: { client_id: true },
 			});
-			const idE = await prismaClient.client_email.findFirst({
-				where: { client_id: idC?.client_id || 0 },
+			const idEMAIL = await prismaClient.client_email.findFirst({
+				where: { client_id: idCLIENT?.client_id || 0 },
 				select: { email_address: true },
 			});
-			if (idC) {
-				const token = crypto.randomBytes(32).toString("hex");
-				const tokenHash = await this.encrypt(token);
-				const url = `${process.env.BASE_URL}/email/${idE?.email_address}/2fa/${token}`;
-				const client = await prismaClient.client.update({
-					where: { client_id: idC?.client_id || 0 },
+			if (idCLIENT) {
+				const OTP = this.generateOTP();
+				const OTPHash = await this.encrypt(OTP.toString());
+				await prismaClient.client.update({
+					where: { client_id: idCLIENT?.client_id || 0 },
 					data: {
-						token: tokenHash,
+						authentication_otp: OTPHash
 					},
 				});
-				sendMail(idE?.email_address, "Autenticação de dois fatores", url);
+				sendOTP(idEMAIL?.email_address, "Autenticação de dois fatores", OTP);
+				console.log(OTP);
+				
 				response
 					.status(201)
 					.json({ message: "Email enviado para a sua caixa de entrada." });
@@ -41,7 +46,7 @@ export class TwoFactorAuthUseCase {
 		} catch {
 			response
 				.status(500)
-				.json({ message: "Erro interno! Tente novamente mais tarde." });
+				.json({ message: "Ocorreu um erro ao processar a sua solicitação! Tente novamente mais tarde." });
 		}
 	}
 

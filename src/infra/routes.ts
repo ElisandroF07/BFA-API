@@ -6,12 +6,13 @@ import { GetBICOntroller } from "../modules/getBI/getBI.controller";
 import { LoginController } from "../modules/login/login.controller";
 import { PersonalDataController } from "../modules/personal-data/personal-data.controller";
 import { ResendEmailController } from "../modules/resend-email/resend-email.controller";
-import { ResetPasswordController } from "../modules/resetPassword/resetPassword.controller";
-import { SetAcessCodeController } from "../modules/setAccessCode/setAccessCode.controller";
+// import { ResetPasswordController } from "../modules/resetPassword/resetPassword.controller";
+// import { SetAcessCodeController } from "../modules/setAccessCode/setAccessCode.controller";
 import { Verify2FAController } from "../modules/verify-2fa/verify-2fa.controller";
 import { VerifyEmailController } from "../modules/verify-email/verify-email.controller";
 import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
 import { VerifyTokenController } from "../modules/verify-token/verify-token.controller";
+import { GetUserDataController } from "../modules/getUserData/getUserData.controller";
 
 const router = Router();
 
@@ -75,29 +76,33 @@ router.get(
 	},
 );
 
-router.get(
-	"/email/:email/2fa/:token",
+router.post(
+	"/verifyOTP",
 	async (request: Request, response: Response) => {
 		new Verify2FAController().handle(response, request);
 	},
 );
 
-router.get(
-	"/resetPassword/:email",
-	async (request: Request, response: Response) => {
-		new ResetPasswordController().handle(request, response);
-	},
-);
+// router.get(
+// 	"/resetPassword/:email",
+// 	async (request: Request, response: Response) => {
+// 		new ResetPasswordController().handle(request, response);
+// 	},
+// );
 
-router.get(
-	"/email/:email/resetPassword/:token",
-	async (request: Request, response: Response) => {
-		new VerifyResetController().handle(request, response);
-	},
-);
+// router.get(
+// 	"/email/:email/resetPassword/:token",
+// 	async (request: Request, response: Response) => {
+// 		new VerifyResetController().handle(request, response);
+// 	},
+// );
 
-router.post("/setAccessCode", async (request: Request, response: Response) => {
-	new SetAcessCodeController().handle(request.body, response);
-});
+// router.post("/setAccessCode", async (request: Request, response: Response) => {
+// 	new SetAcessCodeController().handle(request.body, response);
+// });
+
+router.get("getUserData/:biNumber", async(request: Request, response: Response) => {
+	new GetUserDataController().handle(request, response)
+})
 
 export { router };

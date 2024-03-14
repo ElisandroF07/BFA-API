@@ -29,7 +29,7 @@ export class PersonalDataUseCase {
 			]);
 
 			if (res.data.affairsProgressState === "Activate") {
-				if (res2.data.data.ID_NUMBER) {
+				if (res2.data.data.ID_NUMBER !== null || res2.data.data.ID_NUMBER !== undefined) {
 					let bi_name = `${res2.data.data.FIRST_NAME} ${res2.data.data.LAST_NAME}`;
 					bi_name = bi_name.trim().replace(/\s/g, "");
 					if (bi_name === this.formatName(name)) {

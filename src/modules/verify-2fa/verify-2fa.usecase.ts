@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { prismaClient } from "../../infra/database/prismaClient";
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 export class Verify2FAUseCase {
-	async compareToken(tokenHash: string, token: string) {
-		const response = await bcrypt.compare(token, tokenHash);
+
+	async compareOTP(OTPHash: string, OTP: string) {
+		const response = await bcrypt.compare(OTP, OTPHash);
 		if (response) {
 			return true;
 		}
-
 		return false;
 	}
 
-	async verifyToken(email: string, user_token: string, response: Response) {
+	async verifyOTP(email: string, user_OTP: string, response: Response) {
 		try {
 			const client_email = await prismaClient.client_email.findFirst({
 				where: {
@@ -26,34 +26,35 @@ export class Verify2FAUseCase {
 			const client = await prismaClient.client.findFirst({
 				where: { client_id: client_email?.client_id || 0 },
 				select: {
-					token: true,
+					authentication_otp: true,
 					client_id: true,
 					address: true,
 					personal_data: true,
 					bi_number: true,
-					membership_number: true,
 				}
 			});
 			if (client) {
-				if (await this.compareToken(client.token || "", user_token)) {
+				if (await this.compareOTP(client.authentication_otp || "", user_OTP)) {
 					await prismaClient.client.update({
 						where: { client_id: client.client_id || 0 },
-						data: { token: "" },
+						data: { authentication_otp: "" },
 					});
-					const secret = process.env.SECRET;
+					const secret = process.env.SECRET || "";
 					const token = jwt.sign(
 						{
 							id: client.client_id,
 						},
 						secret,
-						{ expiresIn: "1h" },
 					);
-					response.redirect(
-						`http://localhost:3000/dashboard?token=${token}?user=${client}`,
-					);
-				} else response.redirect("http://localhost:3000/login/error");
+					const pictureProfile = await prismaClient.client_images.findFirst({
+						where: {client_id: client.client_id, image_role: 5}, select: {path: true}
+					})
+					response.status(201).json({message: "Autenticação concluida!", token, client: {personalData: client.personal_data, address: client.address, biNumber: client.bi_number, email: email, pictureProfilePath: pictureProfile?.path}})
+				} else {
+					return response.status(200).json({message: "Código de autenticação inválido!"})
+				};
 			} else {
-				response.redirect("http://localhost:3000/login/error");
+				return response.status(200).json({message: "Endereço de emial inválido!"});
 			}
 		} catch {
 			response
@@ -63,8 +64,8 @@ export class Verify2FAUseCase {
 	}
 
 	execute(response: Response, request: Request) {
-		const email = request.params.email;
-		const token = request.params.token;
-		this.verifyToken(email, token, response);
+		const email = request.body.email;
+		const OTP = request.body.OTP;
+		this.verifyOTP(email, OTP, response);
 	}
 }

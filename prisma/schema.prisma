@@ -31,20 +31,20 @@ model contact_roles {
 }
 
 model client {
-  personal_data     Json?
-  professional_data Json?
-  address           Json?
-  client_id         Int             @id(map: "clients_pkey") @default(autoincrement())
-  role_id           Int             @db.SmallInt
-  bi_number         String?
-  membership_number String?
-  access_code       String?
-  token             String?
-  account           account[]
-  client_roles      client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
-  client_email      client_email[]
-  client_images     client_images[]
-  client_phones     client_phones[]
+  personal_data      Json?
+  professional_data  Json?
+  address            Json?
+  client_id          Int             @id(map: "clients_pkey") @default(autoincrement())
+  role_id            Int             @db.SmallInt
+  bi_number          String?
+  membership_number  String?
+  access_code        String?
+  authentication_otp String?
+  account            account[]
+  client_roles       client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
+  client_email       client_email[]
+  client_images      client_images[]
+  client_phones      client_phones[]
 }
 
 model client_email {
