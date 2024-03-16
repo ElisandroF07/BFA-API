@@ -49,7 +49,7 @@ export class Verify2FAUseCase {
 					const pictureProfile = await prismaClient.client_images.findFirst({
 						where: {client_id: client.client_id, image_role: 5}, select: {path: true}
 					})
-					response.status(201).json({message: "Autenticação concluida!", token, client: {personalData: client.personal_data, address: client.address, biNumber: client.bi_number, email: email, pictureProfilePath: pictureProfile?.path}})
+					response.status(201).json({message: "Autenticação concluida!", token, user: {personalData: client.personal_data, address: client.address, biNumber: client.bi_number, email: email, pictureProfilePath: pictureProfile?.path}})
 				} else {
 					return response.status(200).json({message: "Código de autenticação inválido!"})
 				};

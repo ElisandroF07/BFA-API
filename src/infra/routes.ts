@@ -13,6 +13,13 @@ import { VerifyEmailController } from "../modules/verify-email/verify-email.cont
 import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
 import { VerifyTokenController } from "../modules/verify-token/verify-token.controller";
 import { GetUserDataController } from "../modules/getUserData/getUserData.controller";
+import { GetAccountDataController } from "../modules/getAccountData/getAccountData.controller";
+import { verifyToken } from "../middlewares/verifytoken.middleware";
+import { GetCardDataController } from "../modules/getCardData/getCardData.controller";
+import { SetCardNickname } from "../modules/setCardNickname/setCardNickname.usecase";
+import { GetCardDataUseCase } from "../modules/getCardData/getCardData.usecase";
+import { GetAccountDataUseCase } from "../modules/getAccountData/getAccountData.usecase";
+import { GetUserDataUseCase } from "../modules/getUserData/getUserData.usecase";
 
 const router = Router();
 
@@ -102,7 +109,19 @@ router.post(
 // });
 
 router.get("getUserData/:biNumber", async(request: Request, response: Response) => {
-	new GetUserDataController().handle(request, response)
+	new GetUserDataUseCase().execute(request, response)
+})
+
+router.get("/getAccountData/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetAccountDataUseCase().execute(request, response)
+})
+
+router.get("/getCardData/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetCardDataUseCase().execute(request, response)
+})
+
+router.post("/setNickname", verifyToken, async(request: Request, response: Response) => {
+	new SetCardNickname().execute(request, response)
 })
 
 export { router };

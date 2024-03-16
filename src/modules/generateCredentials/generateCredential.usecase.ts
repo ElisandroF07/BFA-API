@@ -87,10 +87,16 @@ export class GenerateCredentialsUseCase {
 					client_id: client?.client_id,
 					account_number: this.createAccountNumber(),
 					account_iban: this.createIBAN(),
+					account_nbi: this.createIBAN(),
+					currency: 'Kwanza (KZ)',
+					authorized_balance: 0.00,
+					available_balance: 0.00,
+					account_role: 1,
+					bic: "BFMAXLOU",
+					state: "Ativa",
 					created_at: Date.now().toString(),
 				},
 			});
-			console.log("ET");
 
 			const pin = this.generatePin();
 			const pinHash = await this.encrypt(pin.toString());
@@ -125,8 +131,6 @@ export class GenerateCredentialsUseCase {
 	}
 
 	async execute(request: Request, response: Response) {
-		console.log("Entrei");
-
 		const email = request.params.email;
 		await this.generateCredentials(email, response);
 	}
