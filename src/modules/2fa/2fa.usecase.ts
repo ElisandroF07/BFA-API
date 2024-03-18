@@ -35,7 +35,6 @@ export class TwoFactorAuthUseCase {
 					},
 				});
 				sendOTP(idEMAIL?.email_address, "Autenticação de dois fatores", OTP);
-				console.log(OTP);
 				
 				response
 					.status(201)

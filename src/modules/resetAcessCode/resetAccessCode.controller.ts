@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { SetAccessCodeUseCase } from "./setAccessCode.usecase";
+import { ResetAccessCodeUseCase } from "./resetAccessCode.usecase";
 
 export class SetAcessCodeController {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	handle(data: any, response: Response) {
-		const useCase = new SetAccessCodeUseCase();
+		const useCase = new ResetAccessCodeUseCase();
 		useCase.execute(data, response);
 	}
 }

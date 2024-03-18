@@ -11,7 +11,6 @@ export class GetCardDataUseCase{
       response.status(200).json({card: {role: card?.role_id, createdAt: card?.created_at ,pin: card?.pin, nickname: card?.nickname, cardNumber: card?.number?.toString()}})
     }
     catch (error){
-      console.log(error);
       return response.status(500).json("Ocorreu um erro ao processar a sua solicitação! Tente novamente mais tarde.")
     }
   }

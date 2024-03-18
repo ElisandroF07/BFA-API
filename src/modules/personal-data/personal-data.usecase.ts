@@ -18,7 +18,6 @@ export class PersonalDataUseCase {
 	}
 
 	 verificarMaioridade(dataString: string): boolean {
-		console.log('batu')
     const dataNascimento = new Date(dataString);
     const dataAtual = new Date();
 
@@ -60,6 +59,24 @@ export class PersonalDataUseCase {
 							let bi_name = `${res2.data.data.FIRST_NAME} ${res2.data.data.LAST_NAME}`;
 							bi_name = bi_name.trim().replace(/\s/g, "");
 							if (bi_name === this.formatName(name)) {
+								const CE = await prismaClient.client_email.findFirst({where: {email_address: email}, select: {client_id: true}})
+								if (CE?.client_id) {
+									const client = await prismaClient.client.update({where: {client_id: CE.client_id || 0}, data: {
+										personal_data: {
+											name: name,
+											gender:
+												res2.data.data.GENDER === "1" ? "Masculino" : "Feminino",
+											birthDate: birthDate,
+										},
+										bi_number: biNumber,
+										role_id: 1,
+										address: {
+											country: "Angola",
+											full_address: res2.data.data.ADDRESS,
+										},
+									}})
+									return response.status(201).json({ message: "Informações adicionadas com sucesso!" });
+								}
 								const test = await prismaClient.client.findFirst({
 									where: { bi_number: biNumber },
 									select: { client_id: true },
@@ -108,6 +125,22 @@ export class PersonalDataUseCase {
 								.status(200)
 								.json({ message: "Introduza o nome conforme consta no seu BI!" });
 						}
+						const CE = await prismaClient.client_email.findFirst({where: {email_address: email}, select: {client_id: true}})
+							if (CE?.client_id) {
+								const client = await prismaClient.client.update({where: {client_id: CE.client_id || 0}, data: {
+									personal_data: {
+										name: name,
+										birthDate: birthDate,
+									},
+									bi_number: biNumber,
+									role_id: 1,
+									address: {
+										country: "Angola",
+									},
+									first_login: true
+								}})
+								return response.status(201).json({ message: "Informações adicionadas com sucesso!" });
+							}
 							const test = await prismaClient.client.findFirst({
 								where: { bi_number: biNumber },
 								select: { client_id: true },
@@ -124,12 +157,14 @@ export class PersonalDataUseCase {
 									address: {
 										country: "Angola",
 									},
+									first_login: true
 								},
 								update: {
 									personal_data: {
 										name: name,
 										birthDate: birthDate,
 									},
+									first_login: true
 								},
 							});
 							const client_email = await prismaClient.client_email.findFirst({

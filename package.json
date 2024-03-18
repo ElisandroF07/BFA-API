@@ -8,7 +8,7 @@
     "dev": "ts-node-dev src/server.ts",
     "build": "tsup src/",
     "start": "node dist/server.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma migrate dev && prisma db pull && prisma generate && prisma studio"
   },
   "keywords": [],
   "author": "",

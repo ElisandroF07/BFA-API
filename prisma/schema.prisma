@@ -40,6 +40,8 @@ model client {
   membership_number  String?
   access_code        String?
   authentication_otp String?
+  first_login        Boolean?
+  token              String?
   account            account[]
   client_roles       client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
   client_email       client_email[]
@@ -54,6 +56,7 @@ model client_email {
   role_id       Int           @db.SmallInt
   client_id     Int?          @db.SmallInt
   token         String?
+  complete      Boolean?
   contact_roles contact_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
   client        client?       @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
 }

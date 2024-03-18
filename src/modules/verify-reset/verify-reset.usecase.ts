@@ -30,7 +30,7 @@ export class VerifyResetUseCase {
 
 		if (client) {
 			if (client.token === "") {
-				return response.redirect("http://localhost:3000/login/error");
+				return response.redirect("http://localhost:3000/expired-token");
 			}
 
 			if (await bcrypt.compare(user_token, client.token || "")) {
@@ -41,14 +41,14 @@ export class VerifyResetUseCase {
 					},
 				});
 				return response.redirect(
-					"http://localhost:3000/forgot-password/credentials",
+					"http://localhost:3000/forgot-password/set-credentials",
 				);
 			}
 
-			return response.redirect("http://localhost:3000/login/error");
+			return response.redirect("http://localhost:3000/expired-token");
 		}
 
-		return response.redirect("http://localhost:3000/login/error");
+		return response.redirect("http://localhost:3000/expired-token");
 	}
 
 	async execute(request: Request, response: Response) {
