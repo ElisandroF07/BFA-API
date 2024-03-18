@@ -1,9 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { router } from "./infra/routes";
-require("dotenv").config({
-	path: process.env.NODE_ENV === "production" ? ".env" : ".env.dev",
-});
+require("dotenv").config()
 
 const app = express();
 const PORT = process.env.PORT;
