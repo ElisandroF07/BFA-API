@@ -18,14 +18,13 @@ export class LoginUseCase {
 				professional_data: true,
 				address: true,
 				role_id: true,
-			},
+			}
 		});
 		if (client) {
-			console.log(client);
+			const email = await prismaClient.client_email.findFirst({where: {client_id: client.client_id}, select: {email_address: true}})
 
 			if (await bcrypt.compare(access_code, client.access_code)) {
-				const secret = process.env.SECRET;
-				return response.status(201).json({ message: "Sucesso!" });
+				return response.status(201).json({ message: "Sucesso!", email: email?.email_address});
 			}
 			return response
 				.status(200)

@@ -18,7 +18,7 @@ export class GetBIUseCase {
 			},
 			select: {
 				bi_number: true,
-			},
+			}
 		});
 		return response.status(200).json({ biNumber: client?.bi_number });
 	}

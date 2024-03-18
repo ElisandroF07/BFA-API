@@ -31,20 +31,22 @@ model contact_roles {
 }
 
 model client {
-  personal_data     Json?
-  professional_data Json?
-  address           Json?
-  client_id         Int             @id(map: "clients_pkey") @default(autoincrement())
-  role_id           Int             @db.SmallInt
-  bi_number         String?
-  membership_number String?
-  access_code       String?
-  token             String?
-  account           account[]
-  client_roles      client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
-  client_email      client_email[]
-  client_images     client_images[]
-  client_phones     client_phones[]
+  personal_data      Json?
+  professional_data  Json?
+  address            Json?
+  client_id          Int             @id(map: "clients_pkey") @default(autoincrement())
+  role_id            Int             @db.SmallInt
+  bi_number          String?
+  membership_number  String?
+  access_code        String?
+  authentication_otp String?
+  first_login        Boolean?
+  token              String?
+  account            account[]
+  client_roles       client_roles    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
+  client_email       client_email[]
+  client_images      client_images[]
+  client_phones      client_phones[]
 }
 
 model client_email {
@@ -54,6 +56,7 @@ model client_email {
   role_id       Int           @db.SmallInt
   client_id     Int?          @db.SmallInt
   token         String?
+  complete      Boolean?
   contact_roles contact_roles @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
   client        client?       @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_id")
 }
@@ -84,13 +87,20 @@ model image_roles {
 }
 
 model account {
-  account_id     Int     @id @default(autoincrement())
-  client_id      Int?    @db.SmallInt
-  account_iban   String?
-  created_at     String?
-  account_number String?
-  client         client? @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_id")
-  card           card[]
+  account_id         Int     @id @default(autoincrement())
+  client_id          Int?    @db.SmallInt
+  account_iban       String?
+  created_at         String?
+  account_number     String?
+  account_nbi        String?
+  bic                String?
+  account_role       Int?    @db.SmallInt
+  available_balance  Float?
+  authorized_balance Float?
+  state              String?
+  currency           String?
+  client             client? @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_id")
+  card               card[]
 }
 
 model card {
@@ -100,6 +110,7 @@ model card {
   account_id Int?        @db.SmallInt
   created_at String?
   pin        String?
+  nickname   String?
   account    account?    @relation(fields: [account_id], references: [account_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_id")
   card_roles card_roles? @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
 }
@@ -108,4 +119,12 @@ model card_roles {
   role_id Int    @id @default(autoincrement())
   name    String
   card    card[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model account_roles {
+  role_id Int     @id @default(autoincrement())
+  name    String?
+
+  @@ignore
 }

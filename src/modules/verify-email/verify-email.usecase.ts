@@ -14,16 +14,15 @@ export class VerifyEmailUseCase {
 	async sendToken(email: string, response: Response) {
 		const res = await prismaClient.client_email.findFirst({
 			where: { email_address: email },
-			select: { verified: true, email_id: true },
+			select: { verified: true, email_id: true, complete: true, client_id: true }
 		});
 
 		if (res) {
-			if (res.verified) {
+			if (res.complete) {
 				return response
-					.status(400)
+					.status(200)
 					.json({ message: "O email já está associado à uma conta!" });
 			}
-
 			try {
 				const token = crypto.randomBytes(32).toString("hex");
 				const tokenHash = await this.encrypt(token);
@@ -33,6 +32,7 @@ export class VerifyEmailUseCase {
 					},
 					data: {
 						token: tokenHash,
+						verified: false
 					},
 				});
 				const url = `${process.env.BASE_URL}/email/${email}/verify/${token}`;
@@ -55,6 +55,7 @@ export class VerifyEmailUseCase {
 						verified: false,
 						role_id: 1,
 						token: tokenHash,
+						complete: false
 					},
 				});
 				const url = `${process.env.BASE_URL}/email/${email}/verify/${token}`;

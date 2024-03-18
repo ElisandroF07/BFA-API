@@ -14,12 +14,12 @@ export class ResendEmailUseCase {
 	async sendToken(email: string, response: Response) {
 		const res = await prismaClient.client_email.findFirst({
 			where: { email_address: email },
-			select: { verified: true, email_id: true, token: true },
+			select: { verified: true, email_id: true, token: true }
 		});
 		if (res) {
 			if (res.verified) {
 				return response
-					.status(422)
+					.status(200)
 					.json({ message: "O email já foi verificado!" });
 			}
 
@@ -44,7 +44,7 @@ export class ResendEmailUseCase {
 			}
 		} else {
 			return response
-				.status(400)
+				.status(200)
 				.json({ message: "Endereço de email inválido!" });
 		}
 	}

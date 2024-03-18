@@ -2,7 +2,7 @@ import cors from "cors";
 import express from "express";
 import { router } from "./infra/routes";
 require("dotenv").config({
-	path: process.env.NODE_ENV === "development" ? ".env.dev" : ".env",
+	path: process.env.NODE_ENV === "production" ? ".env" : ".env.dev",
 });
 
 const app = express();

@@ -54,13 +54,8 @@ export class GenerateCredentialsUseCase {
 	async generateCredentials(email: string, response: Response) {
 		try {
 			const membership_number = this.createMembershipNumber();
-			const membership_numberHash = await this.encrypt(
-				membership_number.toString(),
-			);
 			const accessCode = this.createAccessCode();
-
 			const accessCodeHash = await this.encrypt(accessCode.toString());
-			console.log("At");
 
 			const client = await prismaClient.client_email.findFirst({
 				where: { email_address: email },
@@ -74,23 +69,30 @@ export class GenerateCredentialsUseCase {
 					.status(200)
 					.json({ message: "Este email já está associado à uma conta." });
 			}
-
-			const cc = await prismaClient.client.update({
+			await prismaClient.client.update({
 				where: { client_id: client?.client_id || 0 },
 				data: {
 					membership_number: membership_number.toString(),
 					access_code: accessCodeHash,
 				},
 			});
+			const emailID = await prismaClient.client_email.findFirst({where: {client_id: client?.client_id || 0}, select: {email_id: true}})
+			await prismaClient.client_email.update({where: {email_id: emailID?.email_id || 0}, data: {complete: true}})
 			const account = await prismaClient.account.create({
 				data: {
 					client_id: client?.client_id,
 					account_number: this.createAccountNumber(),
 					account_iban: this.createIBAN(),
+					account_nbi: this.createIBAN(),
+					currency: 'Kwanza (KZ)',
+					authorized_balance: 0.00,
+					available_balance: 0.00,
+					account_role: 1,
+					bic: "BFMAXLOU",
+					state: "Ativa",
 					created_at: Date.now().toString(),
 				},
 			});
-			console.log("ET");
 
 			const pin = this.generatePin();
 			const pinHash = await this.encrypt(pin.toString());
@@ -125,8 +127,6 @@ export class GenerateCredentialsUseCase {
 	}
 
 	async execute(request: Request, response: Response) {
-		console.log("Entrei");
-
 		const email = request.params.email;
 		await this.generateCredentials(email, response);
 	}

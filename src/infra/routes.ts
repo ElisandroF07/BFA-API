@@ -6,12 +6,21 @@ import { GetBICOntroller } from "../modules/getBI/getBI.controller";
 import { LoginController } from "../modules/login/login.controller";
 import { PersonalDataController } from "../modules/personal-data/personal-data.controller";
 import { ResendEmailController } from "../modules/resend-email/resend-email.controller";
-import { ResetPasswordController } from "../modules/resetPassword/resetPassword.controller";
-import { SetAcessCodeController } from "../modules/setAccessCode/setAccessCode.controller";
 import { Verify2FAController } from "../modules/verify-2fa/verify-2fa.controller";
 import { VerifyEmailController } from "../modules/verify-email/verify-email.controller";
-import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
 import { VerifyTokenController } from "../modules/verify-token/verify-token.controller";
+import { verifyToken } from "../middlewares/verifytoken.middleware";
+import { SetCardNickname } from "../modules/setCardNickname/setCardNickname.usecase";
+import { GetCardDataUseCase } from "../modules/getCardData/getCardData.usecase";
+import { GetAccountDataUseCase } from "../modules/getAccountData/getAccountData.usecase";
+import { GetUserDataUseCase } from "../modules/getUserData/getUserData.usecase";
+import { GetProfilePictureUseCase } from "../modules/getProfilePicture/getProfilePicture.usecase";
+import { GetAuthTokenUseCase } from "../modules/getAuthToken/getAuthToken.usecase";
+import { SetAccessCodeUseCase } from "../modules/setAccessCode/setAcessCode.usecase";
+import { GetFirstLoginUseCase } from "../modules/getFirstLogin/GetFirstLogin.usecase";
+import { ResetPasswordController } from "../modules/resetPassword/resetPassword.controller";
+import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
+import { ResetAccessCodeUseCase } from "../modules/resetAcessCode/resetAccessCode.usecase";
 
 const router = Router();
 
@@ -75,9 +84,7 @@ router.get(
 	},
 );
 
-router.get(
-	"/email/:email/2fa/:token",
-	async (request: Request, response: Response) => {
+router.post("/verifyOTP", async (request: Request, response: Response) => {
 		new Verify2FAController().handle(response, request);
 	},
 );
@@ -97,7 +104,41 @@ router.get(
 );
 
 router.post("/setAccessCode", async (request: Request, response: Response) => {
-	new SetAcessCodeController().handle(request.body, response);
+	new ResetAccessCodeUseCase().execute(request, response);
 });
+
+router.get("/getUserData/:biNumber", async(request: Request, response: Response) => {
+	new GetUserDataUseCase().execute(request, response)
+})
+
+router.get("/getAccountData/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetAccountDataUseCase().execute(request, response)
+})
+
+router.get("/getCardData/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetCardDataUseCase().execute(request, response)
+})
+
+router.post("/setNickname", verifyToken, async(request: Request, response: Response) => {
+	new SetCardNickname().execute(request, response)
+})
+
+router.get("/getAuthToken", async(request: Request, response: Response) => {
+	new GetAuthTokenUseCase().execute(request, response)
+})
+
+router.get("/getProfilePicture/:biNumber", async(request: Request, response: Response) => {
+	console.log("teste");
+	
+	new GetProfilePictureUseCase().execute(request, response)
+})
+
+router.post("/setAccessCode", verifyToken, async(request: Request, response: Response) => {
+	new SetAccessCodeUseCase().execute(request, response)
+})
+
+router.get("/verifyLogin/:email", verifyToken, async(request: Request, response: Response) => {
+	new GetFirstLoginUseCase().execute(request, response)
+})
 
 export { router };

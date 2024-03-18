@@ -7,6 +7,29 @@ export class PersonalDataUseCase {
 		return name.join(" ").toUpperCase().trim().replace(/\s/g, "");
 	}
 
+	validateBi(value: number){
+			const formatedNumber = value.toString()
+			const expireAt = formatedNumber.replace('.', '').replace('E', '1');	
+			const atualDate = Date.now()
+			if (parseInt(expireAt) <= atualDate) {
+				return false
+			}
+			return true
+	}
+
+	 verificarMaioridade(dataString: string): boolean {
+    const dataNascimento = new Date(dataString);
+    const dataAtual = new Date();
+
+    const idade = dataAtual.getFullYear() - dataNascimento.getFullYear();
+    if (idade >= 18) {
+			return true
+		}
+		return false
+	}
+
+
+
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	async uploadData(data: any, response: Response) {
 		const { email, name, birthDate, biNumber } = data;
@@ -28,102 +51,144 @@ export class PersonalDataUseCase {
 				),
 			]);
 
-			if (res.data.affairsProgressState === "Activate") {
-				if (res2.data.data.ID_NUMBER) {
-					let bi_name = `${res2.data.data.FIRST_NAME} ${res2.data.data.LAST_NAME}`;
-					bi_name = bi_name.trim().replace(/\s/g, "");
-					if (bi_name === this.formatName(name)) {
-						const test = await prismaClient.client.findFirst({
-							where: { bi_number: biNumber },
-							select: { client_id: true },
-						});
-						const client = await prismaClient.client.upsert({
-							where: { client_id: test?.client_id || 0 },
-							create: {
-								personal_data: {
-									name: name,
-									gender:
-										res2.data.data.GENDER === "1" ? "Masculino" : "Feminino",
-									birthDate: birthDate,
+			if (this.verificarMaioridade(birthDate)){
+				if (res.data.affairsProgressState === "Activate") {	
+					if (this.validateBi(res2.data.data.EXPIRATION_DATE)) {
+	
+						if (res2.data.data.ID_NUMBER !== null || res2.data.data.ID_NUMBER !== undefined) {
+							let bi_name = `${res2.data.data.FIRST_NAME} ${res2.data.data.LAST_NAME}`;
+							bi_name = bi_name.trim().replace(/\s/g, "");
+							if (bi_name === this.formatName(name)) {
+								const CE = await prismaClient.client_email.findFirst({where: {email_address: email}, select: {client_id: true}})
+								if (CE?.client_id) {
+									const client = await prismaClient.client.update({where: {client_id: CE.client_id || 0}, data: {
+										personal_data: {
+											name: name,
+											gender:
+												res2.data.data.GENDER === "1" ? "Masculino" : "Feminino",
+											birthDate: birthDate,
+										},
+										bi_number: biNumber,
+										role_id: 1,
+										address: {
+											country: "Angola",
+											full_address: res2.data.data.ADDRESS,
+										},
+									}})
+									return response.status(201).json({ message: "Informações adicionadas com sucesso!" });
+								}
+								const test = await prismaClient.client.findFirst({
+									where: { bi_number: biNumber },
+									select: { client_id: true },
+								});
+								const client = await prismaClient.client.upsert({
+									where: { client_id: test?.client_id || 0 },
+									create: {
+										personal_data: {
+											name: name,
+											gender:
+												res2.data.data.GENDER === "1" ? "Masculino" : "Feminino",
+											birthDate: birthDate,
+										},
+										bi_number: biNumber,
+										role_id: 1,
+										address: {
+											country: "Angola",
+											full_address: res2.data.data.ADDRESS,
+										},
+									},
+									update: {
+										personal_data: {
+											name: name,
+											gender:
+												res2.data.data.GENDER === "1" ? "Masculino" : "Feminino",
+											birthDate: birthDate,
+										},
+									},
+								});
+								const client_email = await prismaClient.client_email.findFirst({
+									where: { email_address: email },
+									select: { email_id: true },
+								});
+								await prismaClient.client_email.update({
+									where: { email_id: client_email?.email_id },
+									data: {
+										client_id: client.client_id,
+									},
+								});
+								return response
+									.status(201)
+									.json({ message: "Informações adicionadas com sucesso!" });
+							}
+	
+							return response
+								.status(200)
+								.json({ message: "Introduza o nome conforme consta no seu BI!" });
+						}
+						const CE = await prismaClient.client_email.findFirst({where: {email_address: email}, select: {client_id: true}})
+							if (CE?.client_id) {
+								const client = await prismaClient.client.update({where: {client_id: CE.client_id || 0}, data: {
+									personal_data: {
+										name: name,
+										birthDate: birthDate,
+									},
+									bi_number: biNumber,
+									role_id: 1,
+									address: {
+										country: "Angola",
+									},
+									first_login: true
+								}})
+								return response.status(201).json({ message: "Informações adicionadas com sucesso!" });
+							}
+							const test = await prismaClient.client.findFirst({
+								where: { bi_number: biNumber },
+								select: { client_id: true },
+							});
+							const client = await prismaClient.client.upsert({
+								where: { client_id: test?.client_id },
+								create: {
+									personal_data: {
+										name: name,
+										birthDate: birthDate,
+									},
+									bi_number: biNumber,
+									role_id: 1,
+									address: {
+										country: "Angola",
+									},
+									first_login: true
 								},
-								bi_number: biNumber,
-								role_id: 1,
-								address: {
-									country: "Angola",
-									full_address: res2.data.data.ADDRESS,
+								update: {
+									personal_data: {
+										name: name,
+										birthDate: birthDate,
+									},
+									first_login: true
 								},
-							},
-							update: {
-								personal_data: {
-									name: name,
-									gender:
-										res2.data.data.GENDER === "1" ? "Masculino" : "Feminino",
-									birthDate: birthDate,
+							});
+							const client_email = await prismaClient.client_email.findFirst({
+								where: { email_address: email },
+								select: { email_id: true },
+							});
+							await prismaClient.client_email.update({
+								where: { email_id: client_email?.email_id },
+								data: {
+									client_id: client.client_id,
 								},
-							},
-						});
-						const client_email = await prismaClient.client_email.findFirst({
-							where: { email_address: email },
-							select: { email_id: true },
-						});
-						await prismaClient.client_email.update({
-							where: { email_id: client_email?.email_id },
-							data: {
-								client_id: client.client_id,
-							},
-						});
-						return response
-							.status(201)
-							.json({ message: "Informações adicionadas com sucesso!" });
+							});
+							return response.status(201).json({ message: "Informações adicionadas com sucesso!" });
 					}
-
-					return response
-						.status(200)
-						.json({ message: "Introduza o nome conforme consta no seu BI!" });
+					return response.status(200).json({
+						message: "Bilhete de Identidade expirado!",
+					});
 				}
-
-				const test = await prismaClient.client.findFirst({
-					where: { bi_number: biNumber },
-					select: { client_id: true },
+	
+				return response.status(200).json({
+					message: "BI não cadastrado nos serviços de identificação do MINJUD!",
 				});
-				const client = await prismaClient.client.upsert({
-					where: { client_id: test?.client_id },
-					create: {
-						personal_data: {
-							name: name,
-							birthDate: birthDate,
-						},
-						bi_number: biNumber,
-						role_id: 1,
-						address: {
-							country: "Angola",
-						},
-					},
-					update: {
-						personal_data: {
-							name: name,
-							birthDate: birthDate,
-						},
-					},
-				});
-				const client_email = await prismaClient.client_email.findFirst({
-					where: { email_address: email },
-					select: { email_id: true },
-				});
-				await prismaClient.client_email.update({
-					where: { email_id: client_email?.email_id },
-					data: {
-						client_id: client.client_id,
-					},
-				});
-				return response
-					.status(201)
-					.json({ message: "Informações adicionadas com sucesso!" });
 			}
-
-			return response.status(200).json({
-				message: "BI não cadastrado nos serviços de identificação do MINJUD!",
-			});
+			return response.status(200).json({message: "Menor de idade!"})
 		} catch (error) {
 			console.error(error);
 			return response

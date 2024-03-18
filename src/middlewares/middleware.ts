@@ -17,6 +17,7 @@ export const uploadB2 = async (
 	});
 
 	const authResponse = await b2.authorize();
+	
 	const { downloadUrl } = authResponse.data;
 	const response = await b2.getUploadUrl({
 		bucketId: process.env.BUCKET_ID || "",
