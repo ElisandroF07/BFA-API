@@ -14,7 +14,7 @@ export class GetAuthTokenUseCase {
       return response.status(200).json(authResponse.data.authorizationToken)
     }
     catch(err){
-      return response.status(500).json({message: "Ocorreu um erro ao processar a sua solicitação! Tente novamente mais tarde."})
+      return response.status(500).json({message: "Ocorreu um erro ao processar a sua solicitação! Tente novamente mais tarde.", error: err})
     }
   }
 

@@ -111,6 +111,7 @@ model card {
   created_at String?
   pin        String?
   nickname   String?
+  state      String?
   account    account?    @relation(fields: [account_id], references: [account_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_id")
   card_roles card_roles? @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_id")
 }

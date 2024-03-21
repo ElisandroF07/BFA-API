@@ -103,6 +103,7 @@ export class GenerateCredentialsUseCase {
 					role_id: 1,
 					pin: pinHash,
 					created_at: Date.now().toString(),
+					state: "Ativo"
 				},
 			});
 			await sendCredentials(

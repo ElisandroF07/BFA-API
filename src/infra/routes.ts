@@ -21,6 +21,7 @@ import { GetFirstLoginUseCase } from "../modules/getFirstLogin/GetFirstLogin.use
 import { ResetPasswordController } from "../modules/resetPassword/resetPassword.controller";
 import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
 import { ResetAccessCodeUseCase } from "../modules/resetAcessCode/resetAccessCode.usecase";
+import { PrivateResetAccessCodeUseCase } from "../privateModules/privateResetAcessCode/privateResetAccessCode.usecase";
 
 const router = Router();
 
@@ -141,4 +142,7 @@ router.get("/verifyLogin/:email", verifyToken, async(request: Request, response:
 	new GetFirstLoginUseCase().execute(request, response)
 })
 
+router.post("/privateResetAccessCode", verifyToken, async(request: Request, response: Response) => {
+	new PrivateResetAccessCodeUseCase().execute(request, response);
+})
 export { router };

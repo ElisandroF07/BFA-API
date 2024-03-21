@@ -17,13 +17,14 @@ export class ResetAccessCodeUseCase {
     }
     const accessCodeHash = await this.encrypt(accessCode)
     await prismaClient.client.update({where: {client_id: email_client?.client_id||0}, data:{access_code: accessCodeHash, first_login: false}})
-    await sendNote(email, "Alteração do código de acesso");
+    //await sendNote(email, "Alteração do código de acesso");
     return response.status(201).json({message: "Código de acesso redefnido com sucesso!"})
   }
 
   execute(request: Request, response: Response) {
 	  const email = request.body.email
     const accessCode = request.body.accessCode
+    const code = request.body.code
     this.setCode(email, accessCode, response)
   }
 }
