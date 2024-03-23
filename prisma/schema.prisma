@@ -129,3 +129,29 @@ model account_roles {
 
   @@ignore
 }
+
+model entity {
+  entity_id Int     @id(map: "entitys_pkey") @default(autoincrement())
+  reference String?
+  name      String?
+  balance   String?
+}
+
+model transfer_type {
+  type_id   Int         @id @default(autoincrement())
+  name      String?
+  transfers transfers[]
+}
+
+model transfers {
+  id                   Int           @id(map: "transfer_pkey") @default(autoincrement())
+  balance              Decimal?      @db.Decimal
+  accountFrom          String?
+  accountTo            String?
+  transfer_description String?
+  receptor_description String?
+  date                 String?
+  status               String?
+  type                 Int           @default(autoincrement())
+  transfer_type        transfer_type @relation(fields: [type], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "type_fk")
+}

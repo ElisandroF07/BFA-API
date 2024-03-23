@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 export class Verify2FAUseCase {
 
-	async compareOTP(OTPHash: string, OTP: string) {
+	async compareOTP(OTP: string, OTPHash: string,) {
 		const response = await bcrypt.compare(OTP, OTPHash);
 		if (response) {
 			return true;
@@ -34,7 +34,8 @@ export class Verify2FAUseCase {
 				}
 			});
 			if (client) {
-				if (await this.compareOTP(client.authentication_otp || "", user_OTP)) {
+				console.log(user_OTP, email)
+				if (await this.compareOTP(user_OTP, client.authentication_otp || "")) {
 					await prismaClient.client.update({
 						where: { client_id: client.client_id || 0 },
 						data: { authentication_otp: "" },

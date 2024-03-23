@@ -17,30 +17,54 @@ export class TwoFactorAuthUseCase {
 
 	async sendToken(membership_number: string, response: Response) {
 		try {
-			const idCLIENT = await prismaClient.client.findFirst({
-				where: { membership_number: membership_number },
-				select: { client_id: true },
-			});
-			const idEMAIL = await prismaClient.client_email.findFirst({
-				where: { client_id: idCLIENT?.client_id || 0 },
-				select: { email_address: true },
-			});
-			if (idCLIENT) {
-				const OTP = this.generateOTP();
-				const OTPHash = await this.encrypt(OTP.toString());
-				await prismaClient.client.update({
-					where: { client_id: idCLIENT?.client_id || 0 },
-					data: {
-						authentication_otp: OTPHash
-					},
+			if (membership_number.includes("@")) {
+				const client_email = await prismaClient.client_email.findFirst({
+					where: { email_address: membership_number},
+					select: { client_id: true },
 				});
-				sendOTP(idEMAIL?.email_address, "Autenticação de dois fatores", OTP);
-				
-				response
-					.status(201)
-					.json({ message: "Email enviado para a sua caixa de entrada." });
-			} else {
-				response.status(200).json({ message: "Número de adesão inválido!" });
+				if (client_email) {
+					const OTP = this.generateOTP();
+					const OTPHash = await this.encrypt(OTP.toString());
+					await prismaClient.client.update({
+						where: { client_id: client_email?.client_id || 0 },
+						data: {
+							authentication_otp: OTPHash
+						},
+					});
+					sendOTP(membership_number, "Autenticação de dois fatores", OTP)
+					response
+						.status(201)
+						.json({ message: "Email enviado para a sua caixa de entrada." });
+				} else {
+					response.status(200).json({ message: "Email inválido!" });
+				}
+			}
+			else {
+				const idCLIENT = await prismaClient.client.findFirst({
+					where: { membership_number: membership_number },
+					select: { client_id: true },
+				});
+				const idEMAIL = await prismaClient.client_email.findFirst({
+					where: { client_id: idCLIENT?.client_id || 0 },
+					select: { email_address: true },
+				});
+				if (idCLIENT) {
+					const OTP = this.generateOTP();
+					const OTPHash = await this.encrypt(OTP.toString());
+					await prismaClient.client.update({
+						where: { client_id: idCLIENT?.client_id || 0 },
+						data: {
+							authentication_otp: OTPHash
+						},
+					});
+					sendOTP(idEMAIL?.email_address, "Autenticação de dois fatores", OTP);
+					
+					response
+						.status(201)
+						.json({ message: "Email enviado para a sua caixa de entrada." });
+				} else {
+					response.status(200).json({ message: "Número de adesão inválido!" });
+				}
 			}
 		} catch {
 			response

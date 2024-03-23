@@ -22,6 +22,12 @@ import { ResetPasswordController } from "../modules/resetPassword/resetPassword.
 import { VerifyResetController } from "../modules/verify-reset/verify-reset.controller";
 import { ResetAccessCodeUseCase } from "../modules/resetAcessCode/resetAccessCode.usecase";
 import { PrivateResetAccessCodeUseCase } from "../privateModules/privateResetAcessCode/privateResetAccessCode.usecase";
+import { CheckAccessCode } from "../privateModules/checkAccessCode/checkAccessCode.usecase";
+import { GetAccountByNumber } from "../privateModules/getAccountByNumber/getAccountByNumber.usecase";
+import { GetAccountByIban } from "../privateModules/getAccountByIban/getAccountByIban.usecase";
+import { PrivateTwoFactorAuthUseCase } from "../privateModules/private2fa/private2fa.usecase";
+import { Check2FA } from "../privateModules/check2FA/check2FA.usecase";
+import { SetEmailUseCase } from "../privateModules/setEmail/setEmail.usecase";
 
 const router = Router();
 
@@ -145,4 +151,29 @@ router.get("/verifyLogin/:email", verifyToken, async(request: Request, response:
 router.post("/privateResetAccessCode", verifyToken, async(request: Request, response: Response) => {
 	new PrivateResetAccessCodeUseCase().execute(request, response);
 })
+
+router.post("/checkAccessCode", verifyToken, async(request: Request, response: Response) => {
+	new CheckAccessCode().execute(request, response);
+})
+
+router.get("/getAccountByNumber/:accountNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetAccountByNumber().execute(request, response);
+})
+
+router.get("/getAccountByIban/:accountIban", verifyToken, async(request: Request, response: Response) => {
+	new GetAccountByIban().execute(request, response);
+})
+
+router.get("/private2fa/:email/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new PrivateTwoFactorAuthUseCase().execute(response, request);
+})
+
+router.get("/check2FA/:otp/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new Check2FA().execute(request, response);
+})
+
+router.get("/setEmail/:email/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new SetEmailUseCase().execute(request, response);
+})
+
 export { router };
