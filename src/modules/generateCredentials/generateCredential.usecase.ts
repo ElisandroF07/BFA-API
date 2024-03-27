@@ -61,14 +61,6 @@ export class GenerateCredentialsUseCase {
 				where: { email_address: email },
 				select: { client_id: true },
 			});
-			const verify = await prismaClient.account.findFirst({
-				where: { client_id: client?.client_id || 0 },
-			});
-			if (verify) {
-				return response
-					.status(200)
-					.json({ message: "Este email já está associado à uma conta." });
-			}
 			await prismaClient.client.update({
 				where: { client_id: client?.client_id || 0 },
 				data: {
@@ -77,7 +69,7 @@ export class GenerateCredentialsUseCase {
 				},
 			});
 			const emailID = await prismaClient.client_email.findFirst({where: {client_id: client?.client_id || 0}, select: {email_id: true}})
-			await prismaClient.client_email.update({where: {email_id: emailID?.email_id || 0}, data: {complete: true}})
+			await prismaClient.client_email.update({where: {email_id: emailID?.email_id || 0}, data: {complete: true, verified: true}})
 			const account = await prismaClient.account.create({
 				data: {
 					client_id: client?.client_id,
