@@ -30,7 +30,6 @@ export class LoginUseCase {
 					.status(200)
 					.json({ message: "Código de acesso incorreto!" });
 			}
-	
 			return response
 				.status(200)
 				.json({ message: "Email não encontrado!" });

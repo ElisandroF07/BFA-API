@@ -18,7 +18,6 @@ export class GetAccountDataUseCase{
         currency: true,
         state: true,
       }})
-      
       response.status(200).json({account: {role: account?.account_role, iban: account?.account_iban, nbi: account?.account_nbi, number: account?.account_number, available_balance: account?.available_balance, authorized_balance: account?.authorized_balance, created_at: account?.created_at, currency: account?.currency, state: account?.state, bic: account?.bic}})
     }
     catch (error){

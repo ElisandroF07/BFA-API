@@ -7,16 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model register_requests {
-  request_id   Int       @id @default(autoincrement())
-  otp_code     String?
-  created_at   DateTime? @db.Date
-  phone_number BigInt?
-  finished     Boolean?  @default(false)
-  token        String?
-  email        String?
-}
-
 model client_roles {
   role_id   Int      @id(map: "roles_pkey") @default(autoincrement())
   role_name String?  @db.VarChar(20)
@@ -47,6 +37,7 @@ model client {
   client_email       client_email[]
   client_images      client_images[]
   client_phones      client_phones[]
+  friends            friends[]
 }
 
 model client_email {
@@ -154,4 +145,40 @@ model transfers {
   status               String?
   type                 Int           @default(autoincrement())
   transfer_type        transfer_type @relation(fields: [type], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "type_fk")
+}
+
+model friends {
+  id        Int     @id @default(autoincrement())
+  client_id Int?    @db.SmallInt
+  friend_id Int?    @db.SmallInt
+  nickname  String?
+  client    client? @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_id")
+}
+
+model money_requests {
+  id        Int     @id @default(autoincrement())
+  emailFrom String?
+  emailTo   String?
+  balance   Float?
+  date      String?
+  status    Int?    @db.SmallInt
+}
+
+model request_status {
+  id   Int     @id @default(autoincrement())
+  name String?
+}
+
+model notifications {
+  id                  Int                  @id @default(autoincrement())
+  tittle              String?
+  email               String?
+  type                Int?                 @db.SmallInt
+  notifications_types notifications_types? @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_type")
+}
+
+model notifications_types {
+  id            Int             @id @default(autoincrement())
+  name          String?
+  notifications notifications[]
 }

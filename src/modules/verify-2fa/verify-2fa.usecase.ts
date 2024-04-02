@@ -34,7 +34,6 @@ export class Verify2FAUseCase {
 				}
 			});
 			if (client) {
-				console.log(user_OTP, email)
 				if (await this.compareOTP(user_OTP, client.authentication_otp || "")) {
 					await prismaClient.client.update({
 						where: { client_id: client.client_id || 0 },

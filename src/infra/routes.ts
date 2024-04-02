@@ -28,6 +28,22 @@ import { GetAccountByIban } from "../privateModules/getAccountByIban/getAccountB
 import { PrivateTwoFactorAuthUseCase } from "../privateModules/private2fa/private2fa.usecase";
 import { Check2FA } from "../privateModules/check2FA/check2FA.usecase";
 import { SetEmailUseCase } from "../privateModules/setEmail/setEmail.usecase";
+import { TransferInterbancUseCase } from "../privateModules/transferences/interbanc.usecase";
+import { TransferIntrabancUseCase } from "../privateModules/transferences/intrabanc.usecase";
+import { GetTransactionsUseCase } from "../privateModules/getTransactions/getTransactions.usecase";
+import { GetTransactionUseCase } from "../privateModules/getTransaction/getTransaction.usecase";
+import { FindFriendUseCase } from "../privateModules/friends/findFriend.usecase";
+import { AddFriendUseCase } from "../privateModules/friends/addFriend.usecase";
+import { RemoveFriendUseCase } from "../privateModules/friends/removeFriend.usecase";
+import { GetFriendsUseCase } from "../privateModules/friends/getFriends.usecase";
+import { SendMoneyUseCase } from "../privateModules/friends/sendMoney.usecase";
+import { NeedMoneyUseCase } from "../privateModules/friends/needMoney.usecase";
+import { AcceptMoneyRequestUseCase } from "../privateModules/friends/acceptMoneyRequest.usecase";
+import { RejectMoneyRequestUseCase } from "../privateModules/friends/rejectMoneyRequest.usecase copy";
+import { CreateNotificationUseCase } from "../privateModules/notifications/createNotification.usecase";
+import { GetNotificationsUseCase } from "../privateModules/notifications/getNotifications";
+import { GetMoneyRequestUseCase } from "../privateModules/friends/getMoneyRequest";
+import { DeleteNotificationUseCase } from "../privateModules/notifications/deleteNotification.usecase";
 
 const router = Router();
 
@@ -135,8 +151,7 @@ router.get("/getAuthToken", async(request: Request, response: Response) => {
 })
 
 router.get("/getProfilePicture/:biNumber", async(request: Request, response: Response) => {
-	console.log("teste");
-	
+
 	new GetProfilePictureUseCase().execute(request, response)
 })
 
@@ -174,6 +189,70 @@ router.get("/check2FA/:otp/:biNumber", verifyToken, async(request: Request, resp
 
 router.get("/setEmail/:email/:biNumber", verifyToken, async(request: Request, response: Response) => {
 	new SetEmailUseCase().execute(request, response);
+})
+
+router.post("/transferInterbanc", verifyToken, async(request: Request, response: Response) => {
+	new TransferInterbancUseCase().execute(request, response);
+})
+
+router.post("/transferIntrabanc", verifyToken, async(request: Request, response: Response) => {
+	new TransferIntrabancUseCase().execute(request, response);
+})
+
+router.get("/getTransactions/:accountNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetTransactionsUseCase().execute(request, response);
+})
+
+router.get("/getTransaction/:transactionId", verifyToken, async(request: Request, response: Response) => {
+	new GetTransactionUseCase().execute(request, response);
+})
+
+router.get("/findFriend/:email/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new FindFriendUseCase().execute(request, response);
+})
+
+router.post("/addFriend", verifyToken, async(request: Request, response: Response) => {
+	new AddFriendUseCase().execute(request, response);
+})
+
+router.get("/removeFriend/:id", verifyToken, async(request: Request, response: Response) => {
+	new RemoveFriendUseCase().execute(request, response);
+})
+
+router.get("/getFriends/:biNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetFriendsUseCase().execute(request, response);
+})
+
+router.post("/sendMoney", verifyToken, async(request: Request, response: Response) => {
+	new SendMoneyUseCase().execute(request, response);
+})
+
+router.post("/requestMoney", verifyToken, async(request: Request, response: Response) => {
+	new NeedMoneyUseCase().execute(request, response);
+})
+
+router.get("/getNotifications/:email", verifyToken, async(request: Request, response: Response) => {
+	new GetNotificationsUseCase().execute(request, response);
+})
+
+router.get("/getMoneyRequest/:email", verifyToken, async(request: Request, response: Response) => {
+	new GetMoneyRequestUseCase().execute(request, response);
+})
+
+router.get("/rejectMoneyRequest/:id/:notificationId", verifyToken, async(request: Request, response: Response) => {
+	new RejectMoneyRequestUseCase().execute(request, response);
+})
+
+router.get("/acceptMoneyRequest/:id/:notificationId", verifyToken, async(request: Request, response: Response) => {
+	new AcceptMoneyRequestUseCase().execute(request, response);
+})
+
+router.post("/createNotification", async(request: Request, response: Response) => {
+	new CreateNotificationUseCase().execute(request, response);
+})
+
+router.get("/deleteNotification/:id", async(request: Request, response: Response) => {
+	new DeleteNotificationUseCase().execute(request, response);
 })
 
 export { router };

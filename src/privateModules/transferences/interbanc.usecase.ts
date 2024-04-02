@@ -9,7 +9,7 @@ type bodyData = {
   tranfer_description: string
 }
 
-export class TransferIntrabancUseCase{
+export class TransferInterbancUseCase{
   
   async transfer(data: bodyData, response: Response) {
     const accountFrom = await prismaClient.account.findFirst({where: {account_number: data.accountFrom}, select: {authorized_balance: true, available_balance: true, account_id: true}})
@@ -17,10 +17,10 @@ export class TransferIntrabancUseCase{
       return response.status(200).json({message: "Saldo insuficiênte."})
     }
     try {
-      const accountTo = await prismaClient.account.findFirst({where: {account_number: data.accountTo}, select: {authorized_balance: true, available_balance: true, account_id: true}})
+      const accountTo = await prismaClient.account.findFirst({where: {account_iban: `AO06${data.accountTo}`}, select: {authorized_balance: true, available_balance: true, account_id: true, account_number: true}})
       await prismaClient.account.update(({where: {account_id: accountTo?.account_id}, data: {authorized_balance: parseFloat(accountTo?.authorized_balance?.toString() || "") + parseFloat((data.balance)), available_balance: parseFloat(accountTo?.available_balance?.toString() || "") + parseFloat((data.balance))}}))
       await prismaClient.account.update(({where: {account_id: accountFrom?.account_id}, data: {authorized_balance: parseFloat(accountFrom?.authorized_balance?.toString() || "") - parseFloat((data.balance)), available_balance: parseFloat(accountFrom?.available_balance?.toString() || "") - parseFloat((data.balance))}}))
-      await prismaClient.transfers.create({data: {type: 2, accountFrom: data.accountFrom, accountTo: data.accountTo, balance: data.balance, transfer_description: data.tranfer_description, receptor_description: data.receptor_description, date: Date.now().toString(), status: "Finalizada"}})
+      await prismaClient.transfers.create({data: {type: 1, accountTo: `AO06${data.accountTo}`, accountFrom: data.accountFrom, balance: data.balance, transfer_description: data.tranfer_description, receptor_description: data.receptor_description, date: Date.now().toString(), status: "Finalizada"}})
       return response.status(201).json({message: "Operação concluida com sucesso!"})
     }
     catch {
