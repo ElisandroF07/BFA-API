@@ -1,41 +1,53 @@
 import { Request, Response } from "express";
 import { prismaClient } from "../../infra/database/prismaClient";
 
+// Classe responsável por obter uma transação pelo ID da transação
 export class GetTransactionUseCase {
 
+  // Método assíncrono para obter a transação
   async getTransaction(transactionId: number, response: Response) {
-    const transaction = await prismaClient.transfers.findFirst({where:{id: transactionId} , select: {accountTo: true, balance: true, date: true, status: true, transfer_type: true, receptor_description: true, transfer_description: true, id: true}})
+    // Encontra a transação pelo ID da transação
+    const transaction = await prismaClient.transfers.findFirst({ where: { id: transactionId }, select: { accountTo: true, balance: true, date: true, status: true, transfer_type: true, receptor_description: true, transfer_description: true, id: true } });
     
+    // Verifica se a transação foi encontrada
     if (transaction) {
-      if (transaction?.accountTo?.includes("AO06")) {
+      // Verifica se a conta de destino da transação é um IBAN (começa com "AO06")
+      if (transaction?.accountTo?.startsWith("AO06")) {
+        // Encontra a conta pelo IBAN
         const account = await prismaClient.account.findFirst({
           where: {
-           account_iban : transaction?.accountTo
+            account_iban: transaction?.accountTo
           },
           select: { 
             client_id: true,
           }
-        })
-        const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, select: {personal_data: true}})
-        return response.status(201).json({success: true, transaction: transaction, client: client?.personal_data})
+        });
+        // Encontra o cliente associado à conta pelo ID do cliente
+        const client = await prismaClient.client.findFirst({ where: { client_id: account?.client_id || 0 }, select: { personal_data: true } });
+        // Retorna um objeto com a informação de sucesso, a transação e os dados pessoais do cliente
+        return response.status(201).json({ success: true, transaction: transaction, client: client?.personal_data });
       }
-      const account = await prismaClient.account.findFirst({
-        where: {
-         account_number : transaction?.accountTo
-        },
-        select: { 
-          client_id: true,
-        }
-      })
-      const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, select: {personal_data: true}})
-      return response.status(201).json({success: true, transaction: transaction, client: client?.personal_data})
-      
+        // Encontra a conta pelo número da conta
+        const account = await prismaClient.account.findFirst({
+          where: {
+            account_number: transaction?.accountTo
+          },
+          select: { 
+            client_id: true,
+          }
+        });
+        // Encontra o cliente associado à conta pelo ID do cliente
+        const client = await prismaClient.client.findFirst({ where: { client_id: account?.client_id || 0 }, select: { personal_data: true } });
+        // Retorna um objeto com a informação de sucesso, a transação e os dados pessoais do cliente
+        return response.status(201).json({ success: true, transaction: transaction, client: client?.personal_data });
     }
-    return response.status(200).json({success: false, transaction: null})
+    // Retorna um objeto com a informação de que a transação não foi encontrada
+    return response.status(200).json({ success: false, transaction: null });
   }
 
+  // Método para executar a busca da transação a partir de uma requisição HTTP
   execute(request: Request, response: Response) {
-    const transactionId = parseInt(request.params.transactionId)
-    this.getTransaction(transactionId, response)
+    const transactionId = parseInt(request.params.transactionId);
+    this.getTransaction(transactionId, response);
   }
 }

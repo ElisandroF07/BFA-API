@@ -4,26 +4,32 @@ import type { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import { prismaClient } from "../infra/database/prismaClient";
 
+// Configuração do multer para armazenar os arquivos em memória
 export const uploadMulter = multer({ storage: multer.memoryStorage() }).any();
 
+// Middleware para upload de arquivos para o Backblaze B2
 export const uploadB2 = async (
 	req: Request,
 	res: Response,
 	next: NextFunction,
 ) => {
+	// Cria uma instância do cliente B2
 	const b2 = new B2({
 		applicationKeyId: process.env.KEY_ID || "",
 		applicationKey: process.env.APP_KEY || "",
 	});
 
+	// Autoriza o cliente B2
 	const authResponse = await b2.authorize();
-	
 	const { downloadUrl } = authResponse.data;
+
+	// Obtém a URL de upload
 	const response = await b2.getUploadUrl({
 		bucketId: process.env.BUCKET_ID || "",
 	});
 	const { authorizationToken, uploadUrl } = response.data;
 
+	// Encontra o cliente pelo email na base de dados
 	const client = await prismaClient.client_email.findFirst({
 		where: {
 			email_address: req.params.email,
@@ -33,6 +39,7 @@ export const uploadB2 = async (
 		},
 	});
 
+	// Configura os parâmetros para upload de cada tipo de imagem
 	const params1 = {
 		uploadUrl: uploadUrl,
 		uploadAuthToken: authorizationToken,
@@ -64,9 +71,12 @@ export const uploadB2 = async (
 		data: (req.files as Express.Multer.File[])[0].buffer,
 	};
 
+	// Realiza o upload baseado no tipo de imagem
 	if (req.params.imageRole === "1") {
 		const fileInfo = await b2.uploadFile(params1);
+		// Salva informações do arquivo na resposta
 		res.locals = fileInfo.data;
+		// Cria um registro da imagem na base de dados
 		await prismaClient.client_images.create({
 			data: {
 				image_role: 1,

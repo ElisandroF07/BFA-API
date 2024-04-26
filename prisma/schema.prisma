@@ -78,20 +78,24 @@ model image_roles {
 }
 
 model account {
-  account_id         Int     @id @default(autoincrement())
-  client_id          Int?    @db.SmallInt
+  account_id         Int      @id @default(autoincrement())
+  client_id          Int?     @db.SmallInt
   account_iban       String?
   created_at         String?
   account_number     String?
   account_nbi        String?
   bic                String?
-  account_role       Int?    @db.SmallInt
+  account_role       Int?     @db.SmallInt
   available_balance  Float?
   authorized_balance Float?
   state              String?
   currency           String?
-  client             client? @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_id")
+  up_balance         Float?
+  local              String?
+  area               String?
+  client             client?  @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_id")
   card               card[]
+  entity             entity[]
 }
 
 model card {
@@ -113,21 +117,6 @@ model card_roles {
   card    card[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model account_roles {
-  role_id Int     @id @default(autoincrement())
-  name    String?
-
-  @@ignore
-}
-
-model entity {
-  entity_id Int     @id(map: "entitys_pkey") @default(autoincrement())
-  reference String?
-  name      String?
-  balance   String?
-}
-
 model transfer_type {
   type_id   Int         @id @default(autoincrement())
   name      String?
@@ -145,6 +134,7 @@ model transfers {
   status               String?
   type                 Int           @default(autoincrement())
   transfer_type        transfer_type @relation(fields: [type], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "type_fk")
+  upmoney              upmoney[]
 }
 
 model friends {
@@ -165,8 +155,9 @@ model money_requests {
 }
 
 model request_status {
-  id   Int     @id @default(autoincrement())
-  name String?
+  id      Int       @id @default(autoincrement())
+  name    String?
+  upmoney upmoney[]
 }
 
 model notifications {
@@ -181,4 +172,35 @@ model notifications_types {
   id            Int             @id @default(autoincrement())
   name          String?
   notifications notifications[]
+}
+
+model account_roles {
+  role_id Int     @id @default(autoincrement())
+  name    String?
+}
+
+model entity {
+  entity_id   Int      @id(map: "entitys_pkey") @default(autoincrement())
+  reference   String?
+  name        String?
+  balance     String?
+  account_id  Int?     @db.SmallInt
+  description String?
+  products    Json?
+  logo        String?
+  account     account? @relation(fields: [account_id], references: [account_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_account_id")
+}
+
+model upmoney {
+  id             Int             @id @default(autoincrement())
+  number         BigInt?
+  pin            String?
+  date           String?
+  balance        Float?
+  accountFrom    String?
+  accountTo      String?
+  status         Int?            @db.SmallInt
+  transferId     Int?            @db.SmallInt
+  request_status request_status? @relation(fields: [status], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_status")
+  transfers      transfers?      @relation(fields: [transferId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tranferId")
 }
