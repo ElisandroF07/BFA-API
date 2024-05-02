@@ -133,6 +133,7 @@ model transfers {
   date                 String?
   status               String?
   type                 Int           @default(autoincrement())
+  emissor_description  String?
   transfer_type        transfer_type @relation(fields: [type], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "type_fk")
   upmoney              upmoney[]
 }
@@ -203,4 +204,17 @@ model upmoney {
   transferId     Int?            @db.SmallInt
   request_status request_status? @relation(fields: [status], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_status")
   transfers      transfers?      @relation(fields: [transferId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tranferId")
+}
+
+model pay_references {
+  id                  Int     @id @default(autoincrement())
+  reference           String?
+  description         String?
+  balance             Float?
+  date                String?
+  state               Int?    @db.SmallInt
+  entity              String?
+  emissor_description String?
+  payer_description   String?
+  payer_nbi           String?
 }

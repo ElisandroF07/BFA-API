@@ -9,17 +9,13 @@ export class CancelUpmoneyUseCase{
       if (!upmoney) {
         return response.status(200).json({success: false, message: "Id da transação inválido!"})
       }
-      const account = await prismaClient.account.findFirst({where: {account_number: upmoney.accountFrom || ""}, select: {account_id: true, authorized_balance: true, up_balance: true}})
+      const account = await prismaClient.account.findFirst({where: {account_nbi: upmoney.accountFrom || ""}, select: {account_id: true, authorized_balance: true, up_balance: true}})
       const balance = await prismaClient.account.update({where: {account_id: account?.account_id}, data: {
         authorized_balance: parseFloat(account?.authorized_balance?.toString() || "") + parseFloat(upmoney?.balance?.toString() || ""),
         up_balance: parseFloat(account?.up_balance?.toString() || "") - parseFloat(upmoney?.balance?.toString() || "")
       }, select: {authorized_balance: true, available_balance: true, up_balance: true}})
-      await prismaClient.upmoney.update({where: {id: upmoney.id}, data: {
-        status: 3
-      }})
-      await prismaClient.transfers.update({where: {id: transactionId}, data: {
-        status: "Cancelado"
-      }})
+      await prismaClient.upmoney.delete({where: {id: upmoney.id}})
+      await prismaClient.transfers.delete({where: {id: transactionId}})
       const upmoneys =  await prismaClient.upmoney.findMany({
         where: { accountFrom: upmoney.accountFrom },
         select: {

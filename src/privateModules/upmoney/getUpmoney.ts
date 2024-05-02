@@ -15,6 +15,7 @@ export class GetUpMoneyUseCase {
           number: true,
           status: true,
           transferId: true,
+          transfers: true
         },
       });
       
@@ -26,6 +27,7 @@ export class GetUpMoneyUseCase {
           number: data?.number?.toString(),
           status: data?.status,
           transferId: data?.transferId,
+          transfers: data?.transfers
         } 
       });
 

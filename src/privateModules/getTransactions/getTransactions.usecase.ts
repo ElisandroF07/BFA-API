@@ -7,7 +7,7 @@ export class GetTransactionsUseCase {
   // Método assíncrono para obter as transações
   async getTransactions(accountNumber: string, response: Response) {
     // Encontra todas as transações associadas ao número da conta
-    const account = await prismaClient.account.findFirst({where: {account_number: accountNumber}, select: {account_iban: true}})
+    const account = await prismaClient.account.findFirst({where: {account_number: accountNumber}, select: {account_iban: true, account_nbi: true}})
     const transactions = await prismaClient.transfers.findMany({
       where: {
         OR: [
@@ -15,6 +15,8 @@ export class GetTransactionsUseCase {
           { accountTo: accountNumber },
           { accountFrom: account?.account_iban },
           { accountTo: account?.account_iban },
+          { accountFrom: account?.account_nbi },
+          { accountTo: account?.account_nbi },
         ]
       },
       select: {
@@ -26,6 +28,7 @@ export class GetTransactionsUseCase {
         transfer_type: true,
         receptor_description: true,
         transfer_description: true,
+        emissor_description: true,
         id: true
       }
     });

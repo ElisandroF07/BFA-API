@@ -15,13 +15,18 @@ export class GetUpMoneysUseCase {
           number: true,
           status: true,
           transferId: true,
+          transfers: true
         },
       });
-    
+      const client = await prismaClient.account.findFirst({where: {account_nbi: accountNumber}, select: {client: true}})
+      const personalFrom:{name: string[], birthDate: string} = client?.client?.personal_data as {name: string[], birthDate: string}
+      const emissor_description = personalFrom.name.join(' ')
       const formattedData = data.map(item => ({
         ...item,
         number: item?.number?.toString(), // Convertendo o number para string
       }));
+
+
     
       return response.status(200).json({ success: true, data: formattedData });
     }

@@ -32,26 +32,27 @@ export class CreateUpmoneyUseCase {
       return response.status(200).json({success: false, message: "O montante deve estar entre 1000Kz e 200.000Kz. Somente são aceites montantes na casa dos 1000."});
     }
     try {
-      const emailFro = await prismaClient.client_email.findFirst({where: {email_address: data.emailFrom.toString()}, select: {client_id: true}})
-      const accountFrom = await prismaClient.account.findFirst({where: {client_id: emailFro?.client_id || 0}, select: {available_balance: true, account_number: true, authorized_balance: true, account_id: true}})
+      const emailFro = await prismaClient.client_email.findFirst({where: {email_address: data.emailFrom.toString()}, select: {client: true}})
+      const accountFrom = await prismaClient.account.findFirst({where: {client_id: emailFro?.client?.client_id || 0}, select: {available_balance: true, account_number: true, authorized_balance: true, account_id: true, account_nbi: true, up_balance: true, client: true}})
       if ((accountFrom?.authorized_balance || 0) < parseFloat(data.balance)) {
         return response.status(200).json({success: false, message: "Saldo insuficiente!" })
       }
-      const up_balance = await prismaClient.account.findFirst({where: {account_id: accountFrom?.account_id || 0}, select: {up_balance: true}})
+      const personalFrom:{name: string[], birthDate: string} = accountFrom?.client?.personal_data as {name: string[], birthDate: string}
       const account = await prismaClient.account.update({where: {account_id: accountFrom?.account_id || 0}, data: {
         authorized_balance: parseFloat(accountFrom?.authorized_balance?.toString() || "") - parseFloat(data.balance),
-        up_balance: parseFloat(up_balance?.up_balance?.toString() || "") + parseFloat(data.balance)
+        up_balance: parseFloat(accountFrom?.up_balance?.toString() || "") + parseFloat(data.balance)
       }, select: {authorized_balance: true, available_balance: true, up_balance: true}})
       const transfer = await prismaClient.transfers.create({
         data: {
-          accountFrom: accountFrom?.account_number,
+          accountFrom: accountFrom?.account_nbi,
           balance: data.balance,
           date: Date.now().toString(),
           status: "Pentende",
           type: 6,
           transfer_description: "Levantamento sem cartão",
-          receptor_description: "",
-          accountTo: ""
+          emissor_description: personalFrom.name.join(' '),
+          receptor_description: "Nenhum",
+          accountTo: "Nenhum"
         }
       })
       const upMoneyNumber = this.generateNumber()
@@ -59,7 +60,7 @@ export class CreateUpmoneyUseCase {
       const upmoney = await prismaClient.upmoney.create({
         data: {
           transferId: transfer.id,
-          accountFrom: accountFrom?.account_number,
+          accountFrom: accountFrom?.account_nbi,
           balance: parseFloat(data.balance),
           date: Date.now().toString(),
           status: 1,

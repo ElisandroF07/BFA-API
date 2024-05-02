@@ -21,7 +21,10 @@ export class NeedMoneyUseCase{
         // Se já existir, retorna uma mensagem informando que já foi feita uma solicitação
         return response.status(200).json({success: false, message: `Solicitação negada! Já foi feito um pedido de ${requests[0].balance?.toLocaleString('pt-AO', { style: 'currency', currency: 'AOA', maximumFractionDigits: 0 })}. Aguarde a resposta do solicitado!`})
       }
-      
+      const accountTo = await prismaClient.client_email.findFirst({where: {email_address: data.emailTo}, select: {client: true}})
+      const personalTo:{name: string[], birthDate: string} = accountTo?.client?.personal_data as {name: string[], birthDate: string}
+      const accountFrom = await prismaClient.client_email.findFirst({where: {email_address: data.emailFrom}, select: {client: true}})
+      const personalFrom:{name: string[], birthDate: string} = accountFrom?.client?.personal_data as {name: string[], birthDate: string}
       // Cria uma nova solicitação de dinheiro
       await prismaClient.money_requests.create({data: {
         emailFrom: data.emailFrom,
@@ -33,7 +36,7 @@ export class NeedMoneyUseCase{
 
       // Envia uma notificação para o destinatário da solicitação
       const body = {
-        tittle: "Você recebeu uma solicitação de dinheiro.",
+        tittle: `${personalFrom.name[0]} ${personalFrom.name[personalFrom.name.length - 1]} enviou uma solicitação de dinheiro!`,
         email: data.emailTo,
         type: 2
       } 

@@ -17,32 +17,43 @@ export class AcceptMoneyRequestUseCase {
       const request = await prismaClient.money_requests.findFirst({where: {id: data.id}, select: {balance: true, date: true, emailFrom: true, emailTo: true, status: true}})
       
       // Busca o cliente que fez a solicitação
-      const clientTo = await prismaClient.client_email.findFirst({where: {email_address: request?.emailTo || ""}, select: {client_id: true}})
+      const clientTo = await prismaClient.client_email.findFirst({where: {email_address: request?.emailTo || ""}, select: {client: true}})
       
       // Busca o cliente que recebeu a solicitação
-      const clientFrom = await prismaClient.client_email.findFirst({where: {email_address: request?.emailFrom || ""}, select: {client_id: true}})
+      const clientFrom = await prismaClient.client_email.findFirst({where: {email_address: request?.emailFrom || ""}, select: {client: true}})
       
       // Busca a conta do cliente que fez a solicitação
-      const accountFrom = await prismaClient.account.findFirst({where: {client_id: clientFrom?.client_id || 0}, select: {account_id: true, authorized_balance: true, available_balance: true, account_number: true}})
+      const accountFrom = await prismaClient.account.findFirst({where: {client_id: clientFrom?.client?.client_id || 0}, select: {account_id: true, authorized_balance: true, available_balance: true, account_number: true, account_nbi: true}})
       
       // Busca a conta do cliente que recebeu a solicitação
-      const accountTo = await prismaClient.account.findFirst({where: {client_id: clientTo?.client_id || 0}, select: {account_id: true, authorized_balance: true, available_balance: true, account_number: true}})
+      const accountTo = await prismaClient.account.findFirst({where: {client_id: clientTo?.client?.client_id || 0}, select: {account_id: true, authorized_balance: true, available_balance: true, account_number: true, account_nbi: true}})
       
       // Atualiza os saldos das contas envolvidas na transação
       await prismaClient.account.update({where: {account_id: accountFrom?.account_id || 0}, data: {authorized_balance: parseFloat(accountFrom?.authorized_balance?.toString() || "") + parseFloat(request?.balance?.toString() || ""), available_balance: parseFloat(accountFrom?.available_balance?.toString() || "") + parseFloat(request?.balance?.toString() || "")}})
       await prismaClient.account.update({where: {account_id: accountTo?.account_id || 0}, data: {authorized_balance: parseFloat(accountTo?.authorized_balance?.toString() || "") - parseFloat(request?.balance?.toString() || ""), available_balance: parseFloat(accountTo?.available_balance?.toString() || "") - parseFloat(request?.balance?.toString() || "")}})
+      const personalTo:{name: string[], birthDate: string} = clientTo?.client?.personal_data as {name: string[], birthDate: string}
+      const personalFrom:{name: string[], birthDate: string} = clientFrom?.client?.personal_data as {name: string[], birthDate: string}
       
       // Deleta a solicitação de dinheiro após a transação ser concluída
       await prismaClient.money_requests.delete({where: { id: data.id }});
       
       // Registra a transferência na tabela de transferências
-      await prismaClient.transfers.create({data: {balance: request?.balance, date: Date.now().toString(), receptor_description: request?.emailFrom, status: "Finalizada", transfer_description: "Transferência Instantânia por Solicitação", type: 5, accountFrom: accountTo?.account_number, accountTo: accountFrom?.account_number}})
+      await prismaClient.transfers.create({data: {
+        balance: request?.balance, 
+        date: Date.now().toString(), 
+        receptor_description: personalFrom.name.join(' '), 
+        emissor_description: personalTo.name.join(' '),
+        status: "Finalizada", 
+        transfer_description: "Transferência Express", 
+        type: 5, 
+        accountFrom: accountTo?.account_nbi, 
+        accountTo: accountFrom?.account_nbi}})
       
       // Busca os dados pessoais do cliente que recebeu a solicitação
       // const client = await prismaClient.client.findFirst({where: {client_id: clientTo?.client_id || 0}, select: {personal_data: true}})
     
       await prismaClient.notifications.create({data: {
-        tittle: `${request?.emailTo} aceitou a sua solicitação de dinheiro.`,
+        tittle: `${personalTo.name[0]} ${personalFrom.name[personalTo.name.length -1]} aceitou a sua solicitação de dinheiro!`,
         email: request?.emailFrom,
         type: 1
       }})

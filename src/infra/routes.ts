@@ -60,6 +60,12 @@ import { GenerateCredentialsUseCase } from "../modules/generateCredentials/gener
 import { SendOTPUseCase } from "../privateModules/sendOTP/sendOTP.usecase";
 import { PayUseCase } from "../modules/entity/pay.usecase";
 import { generatePDF } from "../modules/pdf/generatePDF.usecase";
+import { CreateReferenceUseCase } from "../modules/entity/createReferece.usecase";
+import { GetReferencesUseCase } from "../modules/entity/getReferences.usecase";
+import { GetReferenceUseCase } from "../modules/entity/getReference.usecase";
+import { CancelReferenceUseCase } from "../modules/entity/cancelReference.usecase";
+import { PayByReferenceUseCase } from "../privateModules/payByReference/payByReference";
+import { GetReference2UseCase } from "../modules/entity/getReference2.usecase";
 
 // Inicializando o router do Express
 const router = Router();
@@ -362,6 +368,30 @@ router.post("/pay", verifyToken, async(request: Request, response: Response) => 
 
 router.get("/generatePDF/:type/:transactionId", async(request: Request, response: Response) => {
 	new generatePDF().execute(request, response);
+})
+
+router.post("/createReference", verifyToken, async(request: Request, response: Response) => {
+	new CreateReferenceUseCase().execute(request, response);
+})
+
+router.get("/getReferences/:accountNumber", verifyToken, async(request: Request, response: Response) => {
+	new GetReferencesUseCase().execute(request, response);
+})
+
+router.get("/getReference/:id", verifyToken, async(request: Request, response: Response) => {
+	new GetReferenceUseCase().execute(request, response);
+})
+
+router.get("/getReference2/:reference", async(request: Request, response: Response) => {
+	new GetReference2UseCase().execute(request, response);
+})
+
+router.post("/cancelReference/:id", verifyToken, async(request: Request, response: Response) => {
+	new CancelReferenceUseCase().execute(request, response);
+})
+
+router.post("/payByReference/", async(request: Request, response: Response) => {
+	new PayByReferenceUseCase().execute(request, response);
 })
 
 // Exportando o router

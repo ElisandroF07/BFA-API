@@ -7,7 +7,7 @@ export class GetTransactionReceptorUseCase {
   // Método assíncrono para obter a transação
   async getTransaction(transactionId: number, response: Response) {
     // Encontra a transação pelo ID da transação
-    const transaction = await prismaClient.transfers.findFirst({ where: { id: transactionId }, select: { accountFrom: true, balance: true, date: true, status: true, transfer_type: true, receptor_description: true, transfer_description: true, id: true } });
+    const transaction = await prismaClient.transfers.findFirst({ where: { id: transactionId }, select: { accountFrom: true, balance: true, date: true, status: true, transfer_type: true, receptor_description: true, emissor_description: true, accountTo: true, transfer_description: true, id: true } });
     
     // Verifica se a transação foi encontrada
     if (transaction) {

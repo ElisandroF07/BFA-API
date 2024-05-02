@@ -14,13 +14,13 @@ export class TransferInterbancUseCase {
   
   async transfer(data: bodyData, response: Response) {
     // Verifica se a conta de origem possui saldo suficiente para a transferência
-    const accountFrom = await prismaClient.account.findFirst({where: {account_number: data.accountFrom}, select: {authorized_balance: true, available_balance: true, account_id: true}})
+    const accountFrom = await prismaClient.account.findFirst({where: {account_number: data.accountFrom}, select: {authorized_balance: true, available_balance: true, account_id: true, account_nbi: true, client: true}})
     if ((accountFrom?.authorized_balance || 0) < parseFloat(data.balance)) {
       return response.status(200).json({message: "Saldo insuficiente."})
     }
     try {
       // Encontra a conta de destino e atualiza os saldos das contas envolvidas na transferência
-      const accountTo = await prismaClient.account.findFirst({where: {account_iban: `AO06${data.accountTo}`}, select: {authorized_balance: true, available_balance: true, account_id: true, account_number: true}})
+      const accountTo = await prismaClient.account.findFirst({where: {account_iban: `AO06${data.accountTo}`}, select: {authorized_balance: true, available_balance: true, account_id: true, account_number: true, account_nbi: true, client: true}})
       await prismaClient.account.update(({where: {account_id: accountTo?.account_id}, data: {authorized_balance: parseFloat(accountTo?.authorized_balance?.toString() || "") + parseFloat((data.balance)), available_balance: parseFloat(accountTo?.available_balance?.toString() || "") + parseFloat((data.balance))}}))
       const result = await prismaClient.account.update(({
         where: {account_id: accountFrom?.account_id}, 
@@ -28,8 +28,20 @@ export class TransferInterbancUseCase {
         select: {authorized_balance: true, available_balance: true}
       }))
       // Cria um registro da transferência na tabela de transferências
-      
-      await prismaClient.transfers.create({data: {type: 1, accountTo: `AO06${data.accountTo}`, accountFrom: data.accountFrom, balance: data.balance, transfer_description: data.transfer_description, receptor_description: data.receptor_description, date: Date.now().toString(), status: "Finalizada"}})
+      const personalTo:{name: string[], birthDate: string} = accountTo?.client?.personal_data as {name: string[], birthDate: string}
+      const personalFrom:{name: string[], birthDate: string} = accountFrom?.client?.personal_data as {name: string[], birthDate: string}
+      await prismaClient.transfers.create({data: 
+        {
+          type: 1, 
+          accountTo: accountTo?.account_nbi,
+          accountFrom: accountFrom?.account_nbi,
+          balance: data.balance,
+          transfer_description: !data.transfer_description ? "Transferência Interbancária na rede Multicaixa" : data.transfer_description,
+          receptor_description: !data.receptor_description ? personalTo.name.join(' ') : data.receptor_description,
+          emissor_description: personalFrom.name.join(' '),
+          date: Date.now().toString(),
+          status: "Finalizada"
+        }})
       return response.status(201).json({message: "Operação concluída com sucesso!", availabe_balance: result.available_balance, authorized_balance: result.authorized_balance})
     }
     catch {
