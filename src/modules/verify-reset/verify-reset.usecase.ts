@@ -33,7 +33,7 @@ export class VerifyResetUseCase {
 		if (client) {
 			if (client.token === "") {
 				// Redireciona para uma página de token expirado se não houver token armazenado
-				return response.redirect("http://localhost:3000/expired-token");
+				return response.redirect("https://bfanet.vercel.app/expired-token");
 			}
 
 			if (await bcrypt.compare(user_token, client.token || "")) {
@@ -45,16 +45,16 @@ export class VerifyResetUseCase {
 					},
 				});
 				return response.redirect(
-					"http://localhost:3000/forgot-password/set-credentials",
+					"https://bfanet.vercel.app/forgot-password/set-credentials",
 				);
 			}
 
 			// Redireciona para uma página de token expirado se os tokens não coincidirem
-			return response.redirect("http://localhost:3000/expired-token");
+			return response.redirect("https://bfanet.vercel.app/expired-token");
 		}
 
 		// Redireciona para uma página de token expirado se não encontrar o usuário
-		return response.redirect("http://localhost:3000/expired-token");
+		return response.redirect("https://bfanet.vercel.app/expired-token");
 	}
 
 	async execute(request: Request, response: Response) {

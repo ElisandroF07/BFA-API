@@ -28,7 +28,7 @@ export class VerifyTokenUseCase {
 		if (token) {
 			if (token.verified) {
 				// Redireciona para uma página de token expirado se o e-mail já estiver verificado
-				return response.redirect("http://localhost:3000/expired-token");
+				return response.redirect("https://bfanet.vercel.app/expired-token");
 			}
 			if (await bcrypt.compare(user_token, token.token || "")) {
 				// Se os tokens coincidirem, atualiza o status do e-mail para verificado e remove o token
@@ -55,16 +55,16 @@ export class VerifyTokenUseCase {
 							professional_data: {},
 						}})
 					}
-					return response.redirect("http://localhost:3000/verified-token");
+					return response.redirect("https://bfanet.vercel.app/verified-token");
 				}
-				return response.redirect("http://localhost:3000/verified-token");
+				return response.redirect("https://bfanet.vercel.app/verified-token");
 			}
 			// Redireciona para uma página de token expirado se os tokens não coincidirem
-			return response.redirect("http://localhost:3000/expired-token");
+			return response.redirect("https://bfanet.vercel.app/expired-token");
 		}
 
 		// Redireciona para uma página de token expirado se o token não for encontrado
-		return response.redirect("http://localhost:3000/expired-token");
+		return response.redirect("https://bfanet.vercel.app/expired-token");
 	}
 
 	execute(response: Response, request: Request) {
