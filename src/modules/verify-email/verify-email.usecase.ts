@@ -48,10 +48,10 @@ export class VerifyEmailUseCase {
         return response
           .status(201)
           .json({ message: `Email enviado para o endereço: ${email}` });
-      } catch {
+      } catch(err) {
         return response
           .status(500)
-          .json({ message: "Erro interno! Tente mais tarde." });
+          .json({ message: err });
       }
     } else {
       try {
