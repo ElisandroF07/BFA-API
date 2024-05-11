@@ -31,7 +31,7 @@ module.exports = async (
 		html: `<div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; border-radius: 10px; text-align: center;">
 						<h1 style="color: #ff6600;">Levantamento sem cartão</h1>
 						<p style="margin-bottom: 20px;">Abaixo estão os dados do levantamento</p>
-						<p style="margin-bottom: 20px;">Código do levantamento</p>
+						<p style="margin-bottom: 20px;">Referência do levantamento</p>
 						<p style="color: black; font-size: 28px; letter-spacing: 10px; font-weight: 600;">${formatNumber(upmoneyNumber)}</p>
 						<p style="margin-top: 10px;">Não compartilhe este email com ninguém.</p>
 					</div>`,

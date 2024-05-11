@@ -138,6 +138,7 @@ export class generatePDF{
       response.send(pdfBuffer);
     }
     catch(err) {
+      console.log(err)
       return response.status(200).json({success: false, message: err})
     }
   }
