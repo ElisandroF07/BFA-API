@@ -7,7 +7,7 @@ export class GetTransactionReceptorUseCase {
   // Método assíncrono para obter a transação
   async getTransaction(transactionId: number, response: Response) {
     // Encontra a transação pelo ID da transação
-    const transaction = await prismaClient.transfers.findFirst({ where: { id: transactionId }, select: { accountFrom: true, balance: true, date: true, status: true, transfer_type: true, receptor_description: true, emissor_description: true, accountTo: true, transfer_description: true, id: true } });
+    const transaction = await prismaClient.transfers.findFirst({ where: { id: transactionId }, select: { accountFrom: true, balance: true, date: true, status: true, transfer_type: true, receptor_description: true, emissor_description: true, accountTo: true, transfer_description: true, id: true }, cacheStrategy: { ttl: 200 } });
     
     // Verifica se a transação foi encontrada
     if (transaction) {
@@ -23,7 +23,7 @@ export class GetTransactionReceptorUseCase {
           }
         });
         // Encontra o cliente associado à conta pelo ID do cliente
-        const client = await prismaClient.client.findFirst({ where: { client_id: account?.client_id || 0 }, select: { personal_data: true } });
+        const client = await prismaClient.client.findFirst({ where: { client_id: account?.client_id || 0 }, select: { personal_data: true }, cacheStrategy: { ttl: 400 } });
         // Retorna um objeto com a informação de sucesso, a transação e os dados pessoais do cliente
         return response.status(201).json({ success: true, transaction: transaction, client: client?.personal_data });
       }
@@ -37,7 +37,7 @@ export class GetTransactionReceptorUseCase {
           }
         });
         // Encontra o cliente associado à conta pelo ID do cliente
-        const client = await prismaClient.client.findFirst({ where: { client_id: account?.client_id || 0 }, select: { personal_data: true } });
+        const client = await prismaClient.client.findFirst({ where: { client_id: account?.client_id || 0 }, select: { personal_data: true }, cacheStrategy: {ttl: 400} });
         // Retorna um objeto com a informação de sucesso, a transação e os dados pessoais do cliente
         return response.status(201).json({ success: true, transaction: transaction, client: client?.personal_data });
     }
