@@ -6,7 +6,7 @@ export class GetEntitiesUseCase {
 
     async getEntities(response: Response) {
         const entities = await prismaClient.entity.findMany()
-        const token = await axios.get("https://bfa-nodejs-api.onrender.com/getAuthToken")
+        const token = await axios.get("https://maximum-janith-franco07-5ccaf5a9.koyeb.app/getAuthToken")
         const auth = `?Authorization=${token.data}`
         const entitiesWithAuthLogo = entities.map(entity => {
             return {

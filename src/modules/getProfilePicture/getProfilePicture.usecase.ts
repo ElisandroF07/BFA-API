@@ -10,7 +10,7 @@ export class GetProfilePictureUseCase {
       // Encontra a imagem de perfil do cliente
       const pictureProfile = await prismaClient.client_images.findFirst({ where: { client_id: client?.client_id || 0, image_role: 5 }, select: { path: true }, cacheStrategy: { ttl: 3600 } })
       // Obtém o token de autorização do servidor de autenticação
-      const token = await axios.get("https://bfa-nodejs-api.onrender.com/getAuthToken")
+      const token = await axios.get("https://maximum-janith-franco07-5ccaf5a9.koyeb.app/getAuthToken")
       // Retorna a URL da imagem de perfil com o token de autorização como parâmetro
       response.status(200).json({ imageUrl: `${pictureProfile?.path}?Authorization=${token.data}` })
     } catch {
