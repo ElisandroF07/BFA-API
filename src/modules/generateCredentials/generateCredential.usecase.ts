@@ -68,8 +68,7 @@ export class GenerateCredentialsUseCase {
 			// Encontra o cliente com base no email
 			const client = await prismaClient.client_email.findFirst({
 				where: { email_address: email },
-				select: { client_id: true },
-				cacheStrategy: { ttl: 3600 }
+				select: { client_id: true }
 			});
 			// Atualiza o número de membro e o código de acesso do cliente
 			await prismaClient.client.update({
@@ -80,7 +79,7 @@ export class GenerateCredentialsUseCase {
 				},
 			});
 			// Atualiza o email para marcá-lo como completo e verificado
-			const emailID = await prismaClient.client_email.findFirst({where: {client_id: client?.client_id || 0}, select: {email_id: true}, cacheStrategy: { ttl: 3600 }})
+			const emailID = await prismaClient.client_email.findFirst({where: {client_id: client?.client_id || 0}, select: {email_id: true}})
 			await prismaClient.client_email.update({where: {email_id: emailID?.email_id || 0}, data: {complete: true, verified: true}})
 			// Cria uma nova conta para o cliente
 			const iban = this.createIBAN()
@@ -135,7 +134,7 @@ export class GenerateCredentialsUseCase {
 		} catch (err) {
 			// Retorna um erro se houver algum problema durante o processo
 			return response.status(200).json({
-				message: `Erro ao processar solicitação! Tente novamente mais tarde.${err}`,
+				message: `Erro ao processar solicitação! Tente novamente mais tarde. ${err}`,
 			});
 		}
 	}
