@@ -17,10 +17,10 @@ export class AcceptMoneyRequestUseCase {
       const request = await prismaClient.money_requests.findFirst({where: {id: data.id}, select: {balance: true, date: true, emailFrom: true, emailTo: true, status: true}})
       
       // Busca o cliente que fez a solicitação
-      const clientTo = await prismaClient.client_email.findFirst({where: {email_address: request?.emailTo || ""}, select: {client: true}})
+      const clientTo = await prismaClient.client_email.findFirst({where: {email_address: request?.emailTo || ""}, select: {client: true}, cacheStrategy: { ttl: 60 }})
       
       // Busca o cliente que recebeu a solicitação
-      const clientFrom = await prismaClient.client_email.findFirst({where: {email_address: request?.emailFrom || ""}, select: {client: true}})
+      const clientFrom = await prismaClient.client_email.findFirst({where: {email_address: request?.emailFrom || ""}, select: {client: true}, cacheStrategy: { ttl: 60 }})
       
       // Busca a conta do cliente que fez a solicitação
       const accountFrom = await prismaClient.account.findFirst({where: {client_id: clientFrom?.client?.client_id || 0}, select: {account_id: true, authorized_balance: true, available_balance: true, account_number: true, account_nbi: true}})

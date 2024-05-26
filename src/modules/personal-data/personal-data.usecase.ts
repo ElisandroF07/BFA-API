@@ -53,7 +53,7 @@ export class PersonalDataUseCase {
                 ),
             ]);
             // Verifica se já existe uma conta associada ao BI
-            const resp = await prismaClient.client.findFirst({ where: { bi_number: biNumber }, select: { client_id: true } })
+            const resp = await prismaClient.client.findFirst({ where: { bi_number: biNumber }, select: { client_id: true }, cacheStrategy: { ttl: 10 } })
             if (resp) {
                 return response.status(200).json({ message: "Já existe uma conta associada à este BI!" })
             }
@@ -67,7 +67,7 @@ export class PersonalDataUseCase {
                                 let bi_name = `${res2.data.data.FIRST_NAME} ${res2.data.data.LAST_NAME}`;
                                 bi_name = bi_name.trim().replace(/\s/g, "");
                                 if (bi_name === this.formatName(name)) {
-                                    const CE = await prismaClient.client_email.findFirst({ where: { email_address: email }, select: { client_id: true } })
+                                    const CE = await prismaClient.client_email.findFirst({ where: { email_address: email }, select: { client_id: true }, cacheStrategy: { ttl: 10 } })
                                     if (CE?.client_id) {
                                         // Atualiza os dados do cliente no banco de dados
                                         const client = await prismaClient.client.update({ where: { client_id: CE.client_id || 0 }, data: {
@@ -88,6 +88,7 @@ export class PersonalDataUseCase {
                                     const test = await prismaClient.client.findFirst({
                                         where: { bi_number: biNumber },
                                         select: { client_id: true },
+                                        cacheStrategy: { ttl: 20 }
                                     });
                                     const client = await prismaClient.client.upsert({
                                         where: { client_id: test?.client_id || 0 },
@@ -117,6 +118,7 @@ export class PersonalDataUseCase {
                                     const client_email = await prismaClient.client_email.findFirst({
                                         where: { email_address: email },
                                         select: { email_id: true },
+                                        cacheStrategy: { ttl: 20 }
                                     });
                                     await prismaClient.client_email.update({
                                         where: { email_id: client_email?.email_id },
@@ -131,7 +133,7 @@ export class PersonalDataUseCase {
                             }
                         }
                         catch {
-                            const CE = await prismaClient.client_email.findFirst({ where: { email_address: email }, select: { client_id: true } })
+                            const CE = await prismaClient.client_email.findFirst({ where: { email_address: email }, select: { client_id: true }, cacheStrategy: { ttl: 20 } })
                             if (CE?.client_id) {
                                 await prismaClient.client.update({ where: { client_id: CE.client_id || 0 }, data: {
                                     personal_data: {

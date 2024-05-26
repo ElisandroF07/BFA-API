@@ -16,7 +16,8 @@ export class VerifyEmailUseCase {
   async sendToken(email: string, response: Response) {
     const res = await prismaClient.client_email.findFirst({
       where: { email_address: email },
-      select: { verified: true, email_id: true, complete: true, client_id: true }
+      select: { verified: true, email_id: true, complete: true, client_id: true },
+      cacheStrategy: { ttl: 60 }
     });
 
     if (res) {

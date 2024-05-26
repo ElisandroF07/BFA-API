@@ -37,6 +37,7 @@ export const uploadB2 = async (
 		select: {
 			client_id: true,
 		},
+		cacheStrategy: { ttl: 3600 }
 	});
 
 	// Configura os parâmetros para upload de cada tipo de imagem

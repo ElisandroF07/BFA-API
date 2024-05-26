@@ -7,7 +7,7 @@ export class GetAccountByIban {
   // Método assíncrono para obter a conta bancária
   async getAccount(iban: string, response: Response) {
     // Encontra a conta bancária pelo IBAN
-    const account = await prismaClient.account.findFirst({ where: { account_iban: iban }, select: { client_id: true } });
+    const account = await prismaClient.account.findFirst({ where: { account_iban: iban }, select: { client_id: true }, cacheStrategy: { ttl: 60 } });
 
     // Verifica se a conta foi encontrada
     if (account) {

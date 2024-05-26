@@ -13,7 +13,7 @@ export class AddFriendUseCase {
   async addFriend(data: IData, response: Response) {
     try {
       // Busca o cliente associado ao e-mail do amigo
-      const friend = await prismaClient.client_email.findFirst({ where: { email_address: data.email }, select: { client_id: true } })
+      const friend = await prismaClient.client_email.findFirst({ where: { email_address: data.email }, select: { client_id: true }, cacheStrategy: { ttl: 60 } })
       // Busca o cliente associado ao número de identificação biométrica do usuário
       const self = await prismaClient.client.findFirst({ where: { bi_number: data.biNumber }, select: { client_id: true } })
       // Cria uma relação de amizade entre o usuário e o amigo

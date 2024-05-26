@@ -7,7 +7,7 @@ export class GetAccountDataUseCase{
   async getData(biNumber: string, response: Response){
     try {
       // Busca o cliente com base no número de BI
-      const client = await prismaClient.client.findFirst({where: {bi_number: biNumber}, select: {client_id: true}})
+      const client = await prismaClient.client.findFirst({where: {bi_number: biNumber}, select: {client_id: true}, cacheStrategy: { ttl: 3600 }})
       // Busca os dados da conta associada ao cliente
       const account = await prismaClient.account.findFirst({where: {client_id: client?.client_id || 0}, select: {
         account_iban: true,

@@ -9,7 +9,7 @@ export class LoginUseCase {
     // Verifica se o login é feito com um email
     if (membership.includes("@")) {
       // Encontra o cliente pelo email na base de dados
-      const client_email = await prismaClient.client_email.findFirst({where: {email_address: membership.toLowerCase()}, select: {client_id: true}});
+      const client_email = await prismaClient.client_email.findFirst({where: {email_address: membership.toLowerCase()}, select: {client_id: true}, cacheStrategy: { ttl: 420 }});
       const client = await prismaClient.client.findFirst({
         where: {
           client_id: client_email?.client_id || 0,
@@ -23,7 +23,8 @@ export class LoginUseCase {
           professional_data: true,
           address: true,
           role_id: true,
-        }
+        },
+        cacheStrategy: { ttl: 400 }
       });
       if (client) {
         // Verifica se a senha está correta
@@ -55,11 +56,12 @@ export class LoginUseCase {
         professional_data: true,
         address: true,
         role_id: true,
-      }
+      },
+      cacheStrategy: { ttl: 400 }
     });
     if (client) {
       // Encontra o email do cliente na base de dados
-      const email = await prismaClient.client_email.findFirst({where: {client_id: client.client_id}, select: {email_address: true}});
+      const email = await prismaClient.client_email.findFirst({where: {client_id: client.client_id}, select: {email_address: true}, cacheStrategy: { ttl: 400 }});
       // Verifica se a senha está correta
       if (await bcrypt.compare(access_code, client.access_code)) {
         // Retorna uma resposta de sucesso com o email e número de adesão do cliente

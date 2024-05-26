@@ -13,9 +13,9 @@ export class GenerateCredentialsUseCase {
 
 	createIBAN(): string {
 		// Gera um número aleatório formatado para IBAN
-		const numeroAleatorio = Math.floor(Math.random() * 100000000000000);
-		const numeroFormatado = numeroAleatorio.toString().padStart(15, "0");
-		return `AO06004000${numeroFormatado}`;
+		const numeroAleatorio = Math.floor(Math.random() * 10000000000000);
+		const numeroFormatado = numeroAleatorio.toString().padStart(17, "0");
+		return `AO060006${numeroFormatado}`;
 	}
 
 	createAccountNumber(): string {
@@ -23,7 +23,7 @@ export class GenerateCredentialsUseCase {
 		const numerosAleatorios = Array.from({ length: 9 }, () =>
 			Math.floor(Math.random() * 10),
 		).join("");
-		return `${numerosAleatorios}.10.001`;
+		return `${numerosAleatorios}.30.001`;
 	}
 
 	createCardNumber(): number {
@@ -69,6 +69,7 @@ export class GenerateCredentialsUseCase {
 			const client = await prismaClient.client_email.findFirst({
 				where: { email_address: email },
 				select: { client_id: true },
+				cacheStrategy: { ttl: 3600 }
 			});
 			// Atualiza o número de membro e o código de acesso do cliente
 			await prismaClient.client.update({
@@ -79,15 +80,16 @@ export class GenerateCredentialsUseCase {
 				},
 			});
 			// Atualiza o email para marcá-lo como completo e verificado
-			const emailID = await prismaClient.client_email.findFirst({where: {client_id: client?.client_id || 0}, select: {email_id: true}})
+			const emailID = await prismaClient.client_email.findFirst({where: {client_id: client?.client_id || 0}, select: {email_id: true}, cacheStrategy: { ttl: 3600 }})
 			await prismaClient.client_email.update({where: {email_id: emailID?.email_id || 0}, data: {complete: true, verified: true}})
 			// Cria uma nova conta para o cliente
+			const iban = this.createIBAN()
 			const account = await prismaClient.account.create({
 				data: {
 					client_id: client?.client_id,
 					account_number: this.createAccountNumber(),
-					account_iban: this.createIBAN(),
-					account_nbi: this.createIBAN(),
+					account_iban: iban,
+					account_nbi: iban.replace('AO06', ''),
 					currency: 'Kwanza (KZ)',
 					authorized_balance: 0.00,
 					available_balance: 0.00,

@@ -11,7 +11,7 @@ export class FindFriendUseCase {
   // Método assíncrono para encontrar um amigo
   async findFriend(data: IData, response: Response) {
     // Busca o cliente associado ao e-mail informado
-    const email = await prismaClient.client_email.findFirst({ where: { email_address: data.email }, select: { client_id: true } })
+    const email = await prismaClient.client_email.findFirst({ where: { email_address: data.email }, select: { client_id: true }, cacheStrategy: { ttl: 60 } })
     // Busca o cliente associado ao número de identificação biométrica do usuário
     const self = await prismaClient.client.findFirst({ where: { bi_number: data.biNumber }, select: { client_id: true } })
 

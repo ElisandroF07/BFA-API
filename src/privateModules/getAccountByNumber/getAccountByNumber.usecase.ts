@@ -7,7 +7,7 @@ export class GetAccountByNumber {
   // Método assíncrono para obter a conta bancária
   async getAccount(accountNumber: string, response: Response) {
     // Encontra a conta bancária pelo número da conta
-    const account = await prismaClient.account.findFirst({ where: { account_number: accountNumber }, select: { client_id: true } });
+    const account = await prismaClient.account.findFirst({ where: { account_number: accountNumber }, select: { client_id: true }, cacheStrategy: { ttl: 60 } });
 
     // Verifica se a conta foi encontrada
     if (account) {
