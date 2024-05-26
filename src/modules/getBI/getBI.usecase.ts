@@ -1,4 +1,3 @@
-import { parse } from "date-fns";
 import { Request, Response } from "express";
 import { prismaClient } from "../../infra/database/prismaClient";
 
@@ -11,8 +10,7 @@ export class GetBIUseCase {
 			},
 			select: {
 				client_id: true,
-			},
-			cacheStrategy: { ttl: 3600 }
+			}
 		});
 		// Encontra o número do BI associado ao cliente encontrado
 		const client = await prismaClient.client.findFirst({
@@ -21,8 +19,7 @@ export class GetBIUseCase {
 			},
 			select: {
 				bi_number: true,
-			},
-			cacheStrategy: { ttl: 3600 }
+			}
 		});
 		// Retorna o número do BI encontrado ou null se não for encontrado
 		return response.status(200).json({ biNumber: client?.bi_number });
