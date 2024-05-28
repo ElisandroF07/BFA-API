@@ -17,7 +17,7 @@ export class VerifyEmailUseCase {
     const res = await prismaClient.client_email.findFirst({
       where: { email_address: email },
       select: { verified: true, email_id: true, complete: true, client_id: true },
-      cacheStrategy: { ttl: 60 }
+      cacheStrategy: { ttl: 1 }
     });
 
     if (res) {

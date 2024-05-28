@@ -15,7 +15,7 @@ export class SendMoneyUseCase {
   async send(data: IData, response: Response) {
     try {
       // Encontra o cliente pelo email
-      const client_email = await prismaClient.client_email.findFirst({ where: { email_address: data.email }, select: { client: true }, cacheStrategy: { ttl: 60 } });
+      const client_email = await prismaClient.client_email.findFirst({ where: { email_address: data.email }, select: { client: true }, cacheStrategy: { ttl: 1 } });
       
       // Encontra a conta do remetente pelo número da conta
       const accountFrom = await prismaClient.account.findFirst({ where: { account_number: data.accountNumber }, select: { account_id: true, authorized_balance: true, available_balance: true, account_nbi: true, client: true } });

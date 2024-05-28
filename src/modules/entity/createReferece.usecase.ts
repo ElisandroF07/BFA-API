@@ -19,7 +19,7 @@ export class CreateReferenceUseCase {
 
   async create(data: IData ,response: Response) {
     try {
-      const accountComerce = await prismaClient.account.findFirst({where: {account_number: data.entityId}, select: {account_nbi: true, client: true, }, cacheStrategy: { ttl: 3600 }})
+      const accountComerce = await prismaClient.account.findFirst({where: {account_number: data.entityId}, select: {account_nbi: true, client: true, }, cacheStrategy: { ttl: 1 }})
       const personalFrom:{name: string[], birthDate: string} = accountComerce?.client?.personal_data as {name: string[], birthDate: string}
       const reference = await prismaClient.pay_references.create({
         data: {

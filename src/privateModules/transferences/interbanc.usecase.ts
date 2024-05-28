@@ -15,6 +15,34 @@ export class TransferInterbancUseCase {
   async transfer(data: bodyData, response: Response) {
     // Verifica se a conta de origem possui saldo suficiente para a transferência
     const accountFrom = await prismaClient.account.findFirst({where: {account_number: data.accountFrom}, select: {authorized_balance: true, available_balance: true, account_id: true, account_nbi: true, client: true}})
+    const transferences = await prismaClient.transfers.findFirst({where: {accountFrom: data.accountFrom}})
+    const now = new Date();
+    const startOfDay = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+  const endOfDay = new Date(now.setHours(23, 59, 59, 999)).toISOString();
+
+  // Soma o total das transferências realizadas hoje
+  const totalTransferredToday = await prismaClient.transfers.aggregate({
+    _sum: {
+      balance: true
+    },
+    where: {
+      accountFrom: data.accountFrom,
+      date: {
+        gte: startOfDay,
+        lte: endOfDay
+      }
+    }
+  });
+
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  const  totalAmount: any = totalTransferredToday._sum.balance || 0;
+
+  // Verifica se a nova transferência excede o limite diário
+  if (parseFloat(totalAmount) + parseFloat(data.balance) > 5000000) {
+    return response.status(200).json({ message: "Limite diário de transferências excedido." });
+  }
+  // biome-ignore lint/style/noUselessElse: <explanation>
+  else  {
     if ((accountFrom?.authorized_balance || 0) < parseFloat(data.balance)) {
       return response.status(200).json({message: "Saldo insuficiente."})
     }
@@ -47,6 +75,7 @@ export class TransferInterbancUseCase {
     catch {
       return response.status(200).json({message: "Ocorreu um erro ao processar a sua solicitação! Tente novamente mais tarde."})
     }
+  }
   }
   
   execute(request: Request, response: Response) {

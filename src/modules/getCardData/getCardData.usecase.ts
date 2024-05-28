@@ -6,11 +6,11 @@ export class GetCardDataUseCase {
   async getData(biNumber: string, response: Response) {
     try {
       // Encontra o cliente com base no número do BI
-      const client = await prismaClient.client.findFirst({ where: { bi_number: biNumber }, select: { client_id: true }, cacheStrategy: { ttl: 3600 } })
+      const client = await prismaClient.client.findFirst({ where: { bi_number: biNumber }, select: { client_id: true }, cacheStrategy: { ttl: 1 } })
       // Encontra a conta associada ao cliente
-      const account = await prismaClient.account.findFirst({ where: { client_id: client?.client_id || 0 }, select: { account_id: true }, cacheStrategy: { ttl: 3600 } })
+      const account = await prismaClient.account.findFirst({ where: { client_id: client?.client_id || 0 }, select: { account_id: true }, cacheStrategy: { ttl: 1 } })
       // Encontra o cartão associado à conta
-      const card = await prismaClient.card.findFirst({ where: { account_id: account?.account_id || 0 }, select: { number: true, pin: true, role_id: true, created_at: true, nickname: true, state: true }, cacheStrategy: { ttl: 3600 } })
+      const card = await prismaClient.card.findFirst({ where: { account_id: account?.account_id || 0 }, select: { number: true, pin: true, role_id: true, created_at: true, nickname: true, state: true }, cacheStrategy: { ttl: 1 } })
       // Retorna os dados do cartão encontrados
       response.status(200).json({ card: { role: card?.role_id, createdAt: card?.created_at, pin: card?.pin, nickname: card?.nickname, state: card?.state, cardNumber: card?.number?.toString() } })
     } catch (error) {

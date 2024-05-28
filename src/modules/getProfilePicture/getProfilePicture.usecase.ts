@@ -6,9 +6,9 @@ export class GetProfilePictureUseCase {
   async getPicture(biNumber: string, response: Response) {
     try {
       // Encontra o cliente com base no número do BI
-      const client = await prismaClient.client.findFirst({ where: { bi_number: biNumber }, select: { client_id: true }, cacheStrategy: { ttl: 3600 } })
+      const client = await prismaClient.client.findFirst({ where: { bi_number: biNumber }, select: { client_id: true }, cacheStrategy: { ttl: 1 } })
       // Encontra a imagem de perfil do cliente
-      const pictureProfile = await prismaClient.client_images.findFirst({ where: { client_id: client?.client_id || 0, image_role: 5 }, select: { path: true }, cacheStrategy: { ttl: 3600 } })
+      const pictureProfile = await prismaClient.client_images.findFirst({ where: { client_id: client?.client_id || 0, image_role: 5 }, select: { path: true }, cacheStrategy: { ttl: 1 } })
       // Obtém o token de autorização do servidor de autenticação
       const token = await axios.get("https://maximum-janith-franco07-5ccaf5a9.koyeb.app/getAuthToken")
       // Retorna a URL da imagem de perfil com o token de autorização como parâmetro

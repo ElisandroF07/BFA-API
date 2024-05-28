@@ -17,7 +17,7 @@ export class PayUseCase {
   async pay(data: IData, response: Response) {
     try {
       const account = await prismaClient.account.findFirst({where: {account_number: data.accountNumber}})
-      const entity = await prismaClient.entity.findFirst({where: {reference: data.entityReference.toString()}, cacheStrategy: { ttl: 3600 }})
+      const entity = await prismaClient.entity.findFirst({where: {reference: data.entityReference.toString()}, cacheStrategy: { ttl: 1 }})
       const account2 = await prismaClient.account.findFirst({where: {account_id: entity?.account_id || 0}})
       if (data.balance > (account?.authorized_balance || 0)){
         return response.status(200).json({success: false, message: "Saldo insficiente!"})

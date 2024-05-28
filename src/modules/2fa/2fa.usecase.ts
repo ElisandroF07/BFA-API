@@ -25,7 +25,7 @@ export class TwoFactorAuthUseCase {
 				const client_email = await prismaClient.client_email.findFirst({
 					where: { email_address: membership_number },
 					select: { client_id: true },
-					cacheStrategy: { ttl: 3600 }
+					cacheStrategy: { ttl: 1 }
 				});
 				if (client_email) {
 					// Gera um OTP e encripta
@@ -49,12 +49,12 @@ export class TwoFactorAuthUseCase {
 				const idCLIENT = await prismaClient.client.findFirst({
 					where: { membership_number: membership_number },
 					select: { client_id: true },
-					cacheStrategy: { ttl: 3600 }
+					cacheStrategy: { ttl: 1 }
 				});
 				const idEMAIL = await prismaClient.client_email.findFirst({
 					where: { client_id: idCLIENT?.client_id || 0 },
 					select: { email_address: true },
-					cacheStrategy: { ttl: 3600 }
+					cacheStrategy: { ttl: 1 }
 				});
 				if (idCLIENT) {
 					// Gera um OTP e encripta

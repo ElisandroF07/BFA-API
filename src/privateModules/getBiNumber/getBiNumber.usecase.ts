@@ -5,7 +5,7 @@ export class GetBINumberUseCase {
 
   async getBi(email: string, response: Response) {
     try {
-      const client = await prismaClient.client_email.findFirst({where: {email_address: email}, select: {client_id: true}, cacheStrategy: { ttl: 60 }})
+      const client = await prismaClient.client_email.findFirst({where: {email_address: email}, select: {client_id: true}, cacheStrategy: { ttl: 1 }})
       const bi = await prismaClient.client.findFirst({where: {client_id: client?.client_id || 0}, select: {bi_number: true}})
       return response.status(201).json({success: true, biNumber: bi?.bi_number})
     }

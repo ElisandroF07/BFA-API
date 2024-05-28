@@ -37,11 +37,11 @@ export class generatePDF{
 
       switch(type){
         case 1: {
-          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 60 }})
+          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 1 }})
           
           const account = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountTo || ""}})
           const accountFrom = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountFrom}})
-          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 60 }})
+          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 1 }})
           const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}
           //Transferência recebida
           await page.setContent(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Movimento ${transaction?.id} </title></head><body style="width: 100%; font-family: Inter; height: 100vh; display: flex; align-items: center; justify-content: flex-start; flex-direction: column; box-sizing: border-box; margin: 0; padding: 0; background-color: #fff;">    <header style="width: 80%; height: max-content; display: flex;
@@ -51,7 +51,7 @@ export class generatePDF{
           break;
         }
         case 2: {
-          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 60 }})
+          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 1 }})
           
           // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
           let  accountFrom 
@@ -64,7 +64,7 @@ export class generatePDF{
             accountFrom = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountTo }})
           }
           const account = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountFrom }}) 
-          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 120 }})
+          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 1 }})
           const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}
           //Transferência enviada
           await page.setContent(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Movimento ${transaction?.id} </title></head><body style="width: 100%; font-family: Inter; height: 100vh; display: flex; align-items: center; justify-content: flex-start; flex-direction: column; box-sizing: border-box; margin: 0; padding: 0; background-color: #fff;">    <header style="width: 80%; height: max-content; display: flex;
@@ -74,10 +74,10 @@ export class generatePDF{
           break;
         }
         case 3: {
-          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 60 }})
+          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 1 }})
           const account = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountFrom || ""}})
-          const entity = await prismaClient.entity.findFirst({where: {reference: transaction?.accountTo || ""}, cacheStrategy: { ttl: 3600 }})
-          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 120 }})
+          const entity = await prismaClient.entity.findFirst({where: {reference: transaction?.accountTo || ""}, cacheStrategy: { ttl: 1 }})
+          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 1 }})
           const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}
           //Pagamento de serviço
           await page.setContent(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Movimento ${transaction?.id} </title></head><body style="width: 100%; font-family: Inter; height: 100vh; display: flex; align-items: center; justify-content: flex-start; flex-direction: column; box-sizing: border-box; margin: 0; padding: 0; background-color: #fff;">    <header style="width: 80%; height: max-content; display: flex;
@@ -90,7 +90,7 @@ export class generatePDF{
           const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}})
           const account = await prismaClient.account.findFirst({where: {account_number: transaction?.accountFrom || ""}})
           const upmoney = await prismaClient.upmoney.findFirst({where: {transferId: transaction?.id}})
-          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 120 }})
+          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 1 }})
           const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}
           //Transferência recebid
           await page.setContent(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Movimento ${transaction?.id} </title></head><body style="width: 100%; font-family: Inter; height: 100vh; display: flex; align-items: center; justify-content: flex-start; flex-direction: column; box-sizing: border-box; margin: 0; padding: 0; background-color: #fff;">    <header style="width: 80%; height: max-content; display: flex;
@@ -100,10 +100,10 @@ export class generatePDF{
           break;
         }
         case 5: {
-          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 60 }})
+          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 1 }})
           const account = await prismaClient.account.findFirst({where: {account_number: transaction?.accountFrom || ""}})
-          const entity = await prismaClient.entity.findFirst({where: {reference: transaction?.accountTo || ""}, cacheStrategy: { ttl: 3600 }})
-          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 120 }})
+          const entity = await prismaClient.entity.findFirst({where: {reference: transaction?.accountTo || ""}, cacheStrategy: { ttl: 1 }})
+          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 1 }})
           const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}
           //Transferência recebida
           await page.setContent(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Movimento ${transaction?.id} </title></head><body style="width: 100%; font-family: Inter; height: 100vh; display: flex; align-items: center; justify-content: flex-start; flex-direction: column; box-sizing: border-box; margin: 0; padding: 0; background-color: #fff;">    <header style="width: 80%; height: max-content; display: flex;
@@ -113,10 +113,10 @@ export class generatePDF{
           break;
         }
         case 6: {
-          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 60 }})
+          const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 1 }})
           const account = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountFrom || ""}})
-          const entity = await prismaClient.entity.findFirst({where: {reference: transaction?.accountTo || ""}, cacheStrategy: { ttl: 3600 }})
-          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 120 }})
+          const entity = await prismaClient.entity.findFirst({where: {reference: transaction?.accountTo || ""}, cacheStrategy: { ttl: 1 }})
+          const client = await prismaClient.client.findFirst({where: {client_id: account?.client_id || 0}, cacheStrategy: { ttl: 1 }})
           const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}
           //Pagamento de serviço
           await page.setContent(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Movimento ${transaction?.id} </title></head><body style="width: 100%; font-family: Inter; height: 100vh; display: flex; align-items: center; justify-content: flex-start; flex-direction: column; box-sizing: border-box; margin: 0; padding: 0; background-color: #fff;">    <header style="width: 80%; height: max-content; display: flex;
