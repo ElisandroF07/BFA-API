@@ -1224,6 +1224,7 @@ export class generatePDF{
   }
   
   execute(request: Request, response: Response) {
+    console.log('teste')
     const type = request.params.type
     const transactionId = request.params.transactionId
     this.generate(parseInt(type), parseInt(transactionId), response)
