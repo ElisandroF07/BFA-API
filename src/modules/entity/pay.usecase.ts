@@ -48,6 +48,8 @@ export class PayUseCase {
               emissor_description: personalFrom.name.join(' '),
               transfer_description: `Produto: ${data.product} - Pacote: ${data.package} - Destinatário: ${data.clientReferences.phone}`,
               receptor_description: entity?.description,
+              pre_balance: account?.available_balance,
+              pos_balance: (account?.available_balance || 0) - data.balance
             }
           })
           
@@ -77,6 +79,8 @@ export class PayUseCase {
               emissor_description: personalFrom.name.join(' '),
               transfer_description: `Referência do cliente: ${data.clientReferences.reference}`,
               receptor_description: entity?.description,
+              pre_balance: account?.available_balance,
+              pos_balance: (account?.available_balance || 0) - data.balance
             }
           })
           return response.status(201).json({success: true, message: "Pagamento efetuado com sucesso!", balances: {authorized_balance: accountFrom.authorized_balance, available_balance: accountFrom.available_balance, up_balance: accountFrom.up_balance}})

@@ -134,6 +134,8 @@ model transfers {
   status               String?
   type                 Int           @default(autoincrement())
   emissor_description  String?
+  pos_balance          Decimal?      @db.Decimal
+  pre_balance          Decimal?      @db.Decimal
   transfer_type        transfer_type @relation(fields: [type], references: [type_id], onDelete: NoAction, onUpdate: NoAction, map: "type_fk")
   upmoney              upmoney[]
 }

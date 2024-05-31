@@ -66,6 +66,7 @@ import { GetReferenceUseCase } from "../modules/entity/getReference.usecase";
 import { CancelReferenceUseCase } from "../modules/entity/cancelReference.usecase";
 import { PayByReferenceUseCase } from "../privateModules/payByReference/payByReference";
 import { GetReference2UseCase } from "../modules/entity/getReference2.usecase";
+import { sendPDF } from "../modules/pdf/sendPDF.usecase";
 
 // Inicializando o router do Express
 const router = Router();
@@ -369,6 +370,11 @@ router.post("/pay", verifyToken, async(request: Request, response: Response) => 
 router.get("/generatePDF/:type/:transactionId", async(request: Request, response: Response) => {
 	new generatePDF().execute(request, response);
 })
+
+router.get("/sendPDF/:type/:transactionId/:email", async(request: Request, response: Response) => {
+	new sendPDF().execute(request, response);
+})
+
 
 router.post("/createReference", verifyToken, async(request: Request, response: Response) => {
 	new CreateReferenceUseCase().execute(request, response);

@@ -68,7 +68,9 @@ export class TransferInterbancUseCase {
           receptor_description: !data.receptor_description ? personalTo.name.join(' ') : data.receptor_description,
           emissor_description: personalFrom.name.join(' '),
           date: Date.now().toString(),
-          status: "Finalizada"
+          status: "Finalizada",
+          pre_balance: accountFrom?.available_balance,
+          pos_balance: (accountFrom?.available_balance || 0) - (parseInt(data.balance))
         }})
       return response.status(201).json({message: "Operação concluída com sucesso!", availabe_balance: result.available_balance, authorized_balance: result.authorized_balance})
     }

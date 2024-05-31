@@ -47,7 +47,10 @@ export class AcceptMoneyRequestUseCase {
         transfer_description: "Transferência Express", 
         type: 5, 
         accountFrom: accountTo?.account_nbi, 
-        accountTo: accountFrom?.account_nbi}})
+        accountTo: accountFrom?.account_nbi,
+        pre_balance: accountFrom?.available_balance,
+        pos_balance: (accountFrom?.available_balance || 0) - (request?.balance || 0)
+      }})
       
       // Busca os dados pessoais do cliente que recebeu a solicitação
       // const client = await prismaClient.client.findFirst({where: {client_id: clientTo?.client_id || 0}, select: {personal_data: true}})

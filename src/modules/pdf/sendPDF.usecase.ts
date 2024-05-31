@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { prismaClient } from "../../infra/database/prismaClient";
+const sendEmailPDF = require('../../libs/sendPDF.ts')
 import { ColorTypes, PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 const fs = require('fs');
 
-export class generatePDF{
+export class sendPDF{
 
   formatTimestamp(timestamp: number): string {
     const date = new Date(timestamp);
@@ -40,11 +41,10 @@ export class generatePDF{
     return `KZ ${amount.toLocaleString('pt-PT')}`;
   }
 
-  async generate(type: number, transactionId: number, response: Response) {
+  async generate(type: number, transactionId: number, email: string, response: Response) {
     try {
       switch(type){
         case 1: {
-          
           const transaction = await prismaClient.transfers.findFirst({where: {id: transactionId}, cacheStrategy: { ttl: 1 }})
           
           const account = await prismaClient.account.findFirst({where: {account_nbi: transaction?.accountTo || ""}})
@@ -319,13 +319,10 @@ export class generatePDF{
         
             // Cria um buffer a partir dos bytes do PDF
             const pdfBuffer = Buffer.from(pdfBytes);
-        
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Movimento ${transaction?.id}.pdf`);
-            return response.send(pdfBuffer)
+            await sendEmailPDF(email, "Comprovativo de transação", pdfBuffer, `Movimento ${transaction?.id}`)
+            return response.status(201).json({success: true, message: "Comprovativo enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o comprovativo"})
           }
         }
         case 2: {
@@ -610,17 +607,12 @@ export class generatePDF{
             // Serializa o documento para bytes
             const pdfBytes = await pdfDoc.save();
         
-            // Cria um buffer a partir dos bytes do PDF
             const pdfBuffer = Buffer.from(pdfBytes);
-        
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Movimento ${transaction?.id}.pdf`);
-            return response.send(pdfBuffer)
+            await sendEmailPDF(email, "Comprovativo de transação", pdfBuffer, `Movimento ${transaction?.id}`)
+            return response.status(201).json({success: true, message: "Comprovativo enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o comprovativo"})
           }
-
 
         }
         case 3: {
@@ -897,13 +889,10 @@ export class generatePDF{
         
             // Cria um buffer a partir dos bytes do PDF
             const pdfBuffer = Buffer.from(pdfBytes);
-        
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Movimento ${transaction?.id}.pdf`);
-            return response.send(pdfBuffer)
+            await sendEmailPDF(email, "Extrato de Conta", pdfBuffer, `Movimento ${transaction?.id}`)
+            return response.status(201).json({success: true, message: "Comprovativo enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o comprovativo"})
           }
           
         }
@@ -1180,16 +1169,12 @@ export class generatePDF{
             const pdfBytes = await pdfDoc.save();
         
             // Cria um buffer a partir dos bytes do PDF
-            const pdfBuffer = Buffer.from(pdfBytes);
-        
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Movimento ${transaction?.id}.pdf`);
-            return response.send(pdfBuffer)
+          const pdfBuffer = Buffer.from(pdfBytes);
+            await sendEmailPDF(email, "Extrato de Conta", pdfBuffer, `Movimento ${transaction?.id}`)
+            return response.status(201).json({success: true, message: "Comprovativo enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o comprovativo"})
           }
-          
         }
         case 5: {
           //Pagamento de serviço
@@ -1464,15 +1449,11 @@ export class generatePDF{
             // Serializa o documento para bytes
             const pdfBytes = await pdfDoc.save();
         
-            // Cria um buffer a partir dos bytes do PDF
-            const pdfBuffer = Buffer.from(pdfBytes);
-        
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Movimento ${transaction?.id}.pdf`);
-            return response.send(pdfBuffer)
+          const pdfBuffer = Buffer.from(pdfBytes);
+            await sendEmailPDF(email, "Comprovativo de pagamento", pdfBuffer, `Movimento ${transaction?.id}`)
+            return response.status(201).json({success: true, message: "Comprovativo enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF", error})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o comprovativo!"})
           }
         }
         case 6: {
@@ -1747,16 +1728,11 @@ export class generatePDF{
         
             // Serializa o documento para bytes
             const pdfBytes = await pdfDoc.save();
-        
-            // Cria um buffer a partir dos bytes do PDF
-            const pdfBuffer = Buffer.from(pdfBytes);
-        
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Movimento ${transaction?.id}.pdf`);
-            return response.send(pdfBuffer)
+          const pdfBuffer = Buffer.from(pdfBytes);
+            await sendEmailPDF(email, "Comprovativo de pagamento", pdfBuffer, `Movimento ${transaction?.id}`)
+            return response.status(201).json({success: true, message: "Extrato de conta enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o comprovativo"})
           }
         }
         case 7: {
@@ -2052,16 +2028,12 @@ export class generatePDF{
         
             // Serializa o documento para bytes
             const pdfBytes = await pdfDoc.save();
-        
-            // Cria um buffer a partir dos bytes do PDF
-            const pdfBuffer = Buffer.from(pdfBytes);
-        
             // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Conta N_${account?.account_number}.pdf`);
-            return response.send(pdfBuffer)
+            const pdfBuffer = Buffer.from(pdfBytes);
+            await sendEmailPDF(email, "Extrato de Conta", pdfBuffer, `Conta N_${account?.account_number}`)
+            return response.status(201).json({success: true, message: "Extrato de conta enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar o extrato"})
           }
         }
         case 8: {
@@ -2322,13 +2294,10 @@ export class generatePDF{
           
             // Cria um buffer a partir dos bytes do PDF
             const pdfBuffer = Buffer.from(pdfBytes);
-          
-            // Retorna o PDF como um buffer na resposta
-            response.setHeader('Content-Type', 'application/pdf');
-            response.setHeader('Content-Disposition', `attachment; filename=Extrato_de_Movimentos_${Date.now()}.pdf`);
-            return response.send(pdfBuffer);
+            await sendEmailPDF(email, "Extrato de movimentos", pdfBuffer, `Extrato_de_Movimentos_${Date.now()}`)
+            return response.status(201).json({success: true, message: "Comprovativo enviado com sucesso!"})
           } catch (error) {
-            return response.status(200).json({sucess: false, message: "Falha ao gerar PDF"})
+            return response.status(200).json({sucess: false, message: "Falha ao enviar PDF"})
           }
         }
         default: {
@@ -2347,6 +2316,7 @@ export class generatePDF{
     console.log('teste')
     const type = request.params.type
     const transactionId = request.params.transactionId
-    this.generate(parseInt(type), parseInt(transactionId), response)
+    const email = request.params.email
+    this.generate(parseInt(type), parseInt(transactionId), email, response)
   }
 }

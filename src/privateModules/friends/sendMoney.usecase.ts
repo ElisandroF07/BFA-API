@@ -45,7 +45,10 @@ export class SendMoneyUseCase {
          receptor_description: personalTo.name.join(' '), 
          emissor_description: personalFrom.name.join(' '),
          date: Date.now().toString(), 
-         status: "Finalizada" } });
+         status: "Finalizada",
+         pre_balance: accountFrom?.available_balance,
+         pos_balance: (accountFrom?.available_balance || 0) -  (parseInt(data.balance))
+        } });
       
          await prismaClient.notifications.create({data: {
           tittle: `${personalFrom.name[0]} ${personalFrom.name[personalFrom.name.length -1]} enviou ${parseInt(data.balance).toLocaleString('pt-AO', { style: 'currency', currency: 'AOA', maximumFractionDigits: 0 })} à você!`,

@@ -16,7 +16,8 @@ export class PayByReferenceUseCase {
         if ((account?.authorized_balance || 0) < (pay_reference?.balance || 0)) {
           return response.status(200).json({message: "Saldo insuficiente."})
         }
-        else {
+        // biome-ignore lint/style/noUselessElse: <explanation>
+else  {
             const balances = await prismaClient.account.update({where: {account_id: account?.account_id || 0}, data: {authorized_balance: (account?.authorized_balance || 0) - (pay_reference.balance || 0), available_balance: (account?.available_balance || 0) - (pay_reference.balance || 0)}, select: {authorized_balance: true, available_balance: true, up_balance: true}})
             const referenceAccount = await prismaClient.account.findFirst({where: {account_nbi: pay_reference?.entity}, select: {authorized_balance: true, account_nbi: true, available_balance: true, client: true, account_id: true}})
             await prismaClient.account.update({where: {account_id: referenceAccount?.account_id || 0}, data: { authorized_balance: (referenceAccount?.authorized_balance || 0) + (pay_reference?.balance || 0), available_balance: (referenceAccount?.available_balance || 0) + (pay_reference?.balance || 0)}})
@@ -43,12 +44,15 @@ export class PayByReferenceUseCase {
                 transfer_description: `Ref.${pay_reference.reference} - ${pay_reference.description}`,
                 emissor_description: personalFrom.name.join(' '),
                 receptor_description: personalTo.name.join(' '),
+                pre_balance: account?.available_balance,
+                pos_balance: (account?.available_balance || 0) - (pay_reference?.balance || 0)
               }
             })
             return response.status(200).json({ success: true, message: "Pagamento processado com sucesso!", balances });
         }
       }
-      else {
+      // biome-ignore lint/style/noUselessElse: <explanation>
+else  {
         return response.status(200).json({ success: false, message: "Referência de pagamento inválida!", balances: null });
       }
         
