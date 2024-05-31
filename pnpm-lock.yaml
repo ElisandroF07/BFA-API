@@ -4735,9 +4735,9 @@ snapshots:
     optionalDependencies:
       ts-node: 10.9.2(@types/node@20.11.28)(typescript@5.4.2)
 
-  prisma@5.14.0:
+  prisma@5.11.0:
     dependencies:
-      '@prisma/engines': 5.14.0
+      '@prisma/engines': 5.11.0
 
   process-nextick-args@2.0.1: {}
 
