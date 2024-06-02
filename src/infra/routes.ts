@@ -67,6 +67,7 @@ import { CancelReferenceUseCase } from "../modules/entity/cancelReference.usecas
 import { PayByReferenceUseCase } from "../privateModules/payByReference/payByReference";
 import { GetReference2UseCase } from "../modules/entity/getReference2.usecase";
 import { sendPDF } from "../modules/pdf/sendPDF.usecase";
+import { AppyUseCase } from "../privateModules/deposits/apply.usecase";
 
 // Inicializando o router do Express
 const router = Router();
@@ -398,6 +399,10 @@ router.post("/cancelReference/:id", verifyToken, async(request: Request, respons
 
 router.post("/payByReference/", async(request: Request, response: Response) => {
 	new PayByReferenceUseCase().execute(request, response);
+})
+
+router.post("/apply", async(request: Request, response: Response) => {
+	new AppyUseCase().execute(request, response);
 })
 
 // Exportando o router

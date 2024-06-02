@@ -220,3 +220,17 @@ model pay_references {
   payer_description   String?
   payer_nbi           String?
 }
+
+model deposits {
+  id               Int     @id @default(autoincrement())
+  account          String?
+  balance          Float?
+  type             Int?    @db.SmallInt
+  date             String?
+  expires_at       String?
+  transaction_id   Int?    @db.SmallInt
+  juro_bruto       Float?
+  retencao         Float?
+  juro_liquido     Float?
+  poupanca_liquida Float?
+}
