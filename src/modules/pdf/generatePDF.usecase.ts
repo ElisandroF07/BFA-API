@@ -5,6 +5,7 @@ const fs = require('fs');
 
 export class generatePDF{
 
+
   formatTimestamp(timestamp: number): string {
     const date = new Date(timestamp);
     const day = String(date.getDate()).padStart(2, '0');
@@ -40,7 +41,7 @@ export class generatePDF{
     return `KZ ${amount.toLocaleString('pt-PT')}`;
   }
 
-  async generate(type: number, transactionId: number, response: Response) {
+  async generate(type: number, transactionId: number, data: {date1: string, date2: string}, response: Response) {
     try {
       switch(type){
         case 1: {
@@ -2066,15 +2067,21 @@ export class generatePDF{
         }
         case 8: {
           try {
-
+            
             const account = await prismaClient.account.findFirst({where: {account_number: transactionId.toString().replace('30001', '.30.001')}})
-            const transactions = await prismaClient.transfers.findMany({where: {
-              OR: [
-                { accountFrom: account?.account_nbi },
-                { accountTo: account?.account_nbi },
-
-              ]
-            },})
+            const transactions = await prismaClient.transfers.findMany({
+              where: {
+                AND: [
+                  {
+                    OR: [
+                      { accountFrom: account?.account_nbi },
+                      { accountTo: account?.account_nbi },
+                    ]
+                  }
+                ]
+              }
+            });
+            
             const client = await prismaClient.client.findFirst({
               where: { client_id: account?.client_id || 0 },
               cacheStrategy: { ttl: 1 },
@@ -2344,9 +2351,10 @@ export class generatePDF{
   }
   
   execute(request: Request, response: Response) {
-    console.log('teste')
     const type = request.params.type
     const transactionId = request.params.transactionId
-    this.generate(parseInt(type), parseInt(transactionId), response)
+    const teste = type.toString().split('.')
+    const data = {date1:teste[1], date2: teste[2]}
+    this.generate(parseInt(type), parseInt(transactionId), data, response)
   }
 }
