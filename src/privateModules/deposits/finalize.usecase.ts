@@ -16,6 +16,8 @@ export class FinalizeDPUseCase {
       const name: {name: string[], birthDate: string} = client?.personal_data as {name: string[], birthDate: string}    
       await prismaClient.transfers.create({data: {
         balance: deposit?.poupanca_liquida,
+        accountFrom: deposit?.type?.toString(),
+        emissor_description: deposit?.balance?.toString(),
         accountTo: deposit?.account,
         date: Date.now().toString(),
         status: "Finalizada",
@@ -24,6 +26,7 @@ export class FinalizeDPUseCase {
         transfer_description: "Reembolso do capital investido - DP",
         pre_balance: account?.available_balance,
         pos_balance: getAccount.available_balance,
+
       }})
       await prismaClient.notifications.create({data: {
         email: email,
