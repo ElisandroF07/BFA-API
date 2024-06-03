@@ -68,6 +68,7 @@ import { PayByReferenceUseCase } from "../privateModules/payByReference/payByRef
 import { GetReference2UseCase } from "../modules/entity/getReference2.usecase";
 import { sendPDF } from "../modules/pdf/sendPDF.usecase";
 import { AppyUseCase } from "../privateModules/deposits/apply.usecase";
+import { FinalizeDPUseCase } from "../privateModules/deposits/finalize.usecase";
 
 // Inicializando o router do Express
 const router = Router();
@@ -405,5 +406,8 @@ router.post("/apply", async(request: Request, response: Response) => {
 	new AppyUseCase().execute(request, response);
 })
 
+router.post("/finalizeDP/:expires/:email", async(request: Request, response: Response) => {
+	new FinalizeDPUseCase().execute(request, response);
+})
 // Exportando o router
 export { router };
