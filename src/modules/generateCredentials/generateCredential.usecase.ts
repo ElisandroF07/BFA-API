@@ -95,7 +95,7 @@ export class GenerateCredentialsUseCase {
 					up_balance: 0.00,
 					account_role: account_type === "c1" ? 1 : 2,
 					bic: "BFMAXLOU",
-					state: "Inatíva",
+					state: "Ativa",
 					created_at: Date.now().toString(),
 					local: local,
 					area: area
