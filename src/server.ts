@@ -14,5 +14,5 @@ app.use(router);
 
 // Iniciando o servidor na porta especificada
 app.listen(PORT, () => {
-	console.log("Server running!");
+	console.log(`Server running on ${PORT}!`);
 });
